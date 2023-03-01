@@ -37,34 +37,17 @@ void accumulate(struct raster_map *dir_buf, struct raster_map *accum_buf)
 #ifndef USE_LESS_MEMORY
     up_buf = init_raster(nrows, ncols, dir_buf->type);
 
-#ifdef _MSC_VER
-    int ncells = nrows * ncols;
-    int rowcol;
-
-#pragma omp parallel for schedule(guided)
-    for (rowcol = 0; rowcol < ncells; rowcol++) {
-        row = rowcol / ncols;
-        col = rowcol % ncols;
-#else
 #pragma omp parallel for schedule(guided) private(col)
     for (row = 0; row < nrows; row++) {
         for (col = 0; col < ncols; col++)
-#endif
             if (DIR(row, col) != DIR_NULL)
                 UP(row, col) = FIND_UP(row, col);
     }
 #endif
 
-#ifdef _MSC_VER
-#pragma omp parallel for schedule(guided)
-    for (rowcol = 0; rowcol < ncells; rowcol++) {
-        row = rowcol / ncols;
-        col = rowcol % ncols;
-#else
 #pragma omp parallel for schedule(guided) private(col)
     for (row = 0; row < nrows; row++) {
         for (col = 0; col < ncols; col++)
-#endif
             /* if the current cell is not null and has no upstream cells, start
              * tracing down */
             if (DIR(row, col) != DIR_NULL && !UP(row, col))
