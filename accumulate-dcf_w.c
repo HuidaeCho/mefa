@@ -13,7 +13,7 @@
         (row < nrows - 1 ? \
          (col > 0 && DIR(row + 1, col - 1) == NE ? SW : 0) | \
          (DIR(row + 1, col) == N ? S : 0) | \
-         (col < ncols-1 && DIR(row + 1, col + 1) == NW ? SE : 0) : 0))
+         (col < ncols - 1 && DIR(row + 1, col + 1) == NW ? SE : 0) : 0))
 
 #ifdef USE_LESS_MEMORY
 #define UP(row, col) FIND_UP(row, col)
