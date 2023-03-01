@@ -4,10 +4,10 @@ A manuscript is submitted to [the Environmental Modelling and Software journal](
 
 ## Requirements
 
-* C compiler with OpenMP support
+* C compiler with [OpenMP](https://www.openmp.org/) support
 * [GDAL](https://gdal.org/)
 
-For Windows, use [MSYS2](https://www.msys2.org/) and [OSGeo4W](https://trac.osgeo.org/osgeo4w/) to install the GNU C compiler and GDAL, respectively.
+For Windows, use [MSYS2](https://www.msys2.org/) and [OSGeo4W](https://trac.osgeo.org/osgeo4w/) to install [GCC](https://gcc.gnu.org/) and [GDAL](https://gdal.org/), respectively.
 
 ## How to compile MEFFA
 
