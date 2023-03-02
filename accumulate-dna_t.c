@@ -118,63 +118,18 @@ static void trace_down(struct raster_map *dir_buf,
  * sum of upstream accumulation is returned */
 static int sum_up(struct raster_map *accum_buf, int row, int col, int up)
 {
+    int i, j;
     int sum = 0, accum;
 
-    if (up & NW) {
+    for (i = -1; i <= 1; i++) {
+        for (j = -1; j <= 1; j++)
+            if ((i != 0 || j != 0) && (up & dir_checks[i + 1][j + 1])) {
 #pragma omp atomic read seq_cst
-        accum = ACCUM(row - 1, col - 1);
-        if (!accum)
-            return 0;
-        sum += accum;
-    }
-    if (up & N) {
-#pragma omp atomic read seq_cst
-        accum = ACCUM(row - 1, col);
-        if (!accum)
-            return 0;
-        sum += accum;
-    }
-    if (up & NE) {
-#pragma omp atomic read seq_cst
-        accum = ACCUM(row - 1, col + 1);
-        if (!accum)
-            return 0;
-        sum += accum;
-    }
-    if (up & W) {
-#pragma omp atomic read seq_cst
-        accum = ACCUM(row, col - 1);
-        if (!accum)
-            return 0;
-        sum += accum;
-    }
-    if (up & E) {
-#pragma omp atomic read seq_cst
-        accum = ACCUM(row, col + 1);
-        if (!accum)
-            return 0;
-        sum += accum;
-    }
-    if (up & SW) {
-#pragma omp atomic read seq_cst
-        accum = ACCUM(row + 1, col - 1);
-        if (!accum)
-            return 0;
-        sum += accum;
-    }
-    if (up & S) {
-#pragma omp atomic read seq_cst
-        accum = ACCUM(row + 1, col);
-        if (!accum)
-            return 0;
-        sum += accum;
-    }
-    if (up & SE) {
-#pragma omp atomic read seq_cst
-        accum = ACCUM(row + 1, col + 1);
-        if (!accum)
-            return 0;
-        sum += accum;
+                accum = ACCUM(row + i, col + j);
+                if (!accum)
+                    return 0;
+                sum += accum;
+            }
     }
 
     return sum;

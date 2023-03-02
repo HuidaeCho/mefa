@@ -39,6 +39,22 @@ struct raster_map
     int compress;
 };
 
+#ifdef _MAIN_C_
+#define GLOBAL
+#else
+#define GLOBAL extern
+#endif
+
+GLOBAL int dir_checks[3][3]
+#ifdef _MAIN_C_
+    = {
+    {NW, N, NE},
+    {W, 0, E},
+    {SW, S, SE}
+}
+#endif
+;
+
 /* raster.c */
 struct raster_map *init_raster(int, int, int);
 void free_raster(struct raster_map *);

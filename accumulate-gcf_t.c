@@ -134,48 +134,17 @@ static void trace_down(struct raster_map *dir_buf,
  * sum of upstream accumulation is returned */
 static int sum_up(struct raster_map *accum_buf, int row, int col, int up)
 {
+    int i, j;
     int sum = 0, accum;
 
 #pragma omp flush(accum_buf)
-    if (up & NW) {
-        if (!(accum = ACCUM(row - 1, col - 1)))
-            return 0;
-        sum += accum;
-    }
-    if (up & N) {
-        if (!(accum = ACCUM(row - 1, col)))
-            return 0;
-        sum += accum;
-    }
-    if (up & NE) {
-        if (!(accum = ACCUM(row - 1, col + 1)))
-            return 0;
-        sum += accum;
-    }
-    if (up & W) {
-        if (!(accum = ACCUM(row, col - 1)))
-            return 0;
-        sum += accum;
-    }
-    if (up & E) {
-        if (!(accum = ACCUM(row, col + 1)))
-            return 0;
-        sum += accum;
-    }
-    if (up & SW) {
-        if (!(accum = ACCUM(row + 1, col - 1)))
-            return 0;
-        sum += accum;
-    }
-    if (up & S) {
-        if (!(accum = ACCUM(row + 1, col)))
-            return 0;
-        sum += accum;
-    }
-    if (up & SE) {
-        if (!(accum = ACCUM(row + 1, col + 1)))
-            return 0;
-        sum += accum;
+    for (i = -1; i <= 1; i++) {
+        for (j = -1; j <= 1; j++)
+            if ((i != 0 || j != 0) && (up & dir_checks[i + 1][j + 1])) {
+                if (!(accum = ACCUM(row + i, col + j)))
+                    return 0;
+                sum += accum;
+            }
     }
 
     return sum;
