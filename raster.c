@@ -6,6 +6,7 @@ struct raster_map *init_raster(int nrows, int ncols, int type)
 {
     struct raster_map *raster_buf;
     size_t row_size;
+    int i;
 
     raster_buf = malloc(sizeof *raster_buf);
     raster_buf->nrows = nrows;
@@ -25,6 +26,8 @@ struct raster_map *init_raster(int nrows, int ncols, int type)
 
     raster_buf->null_value = 0;
     raster_buf->projection = NULL;
+    for (i = 0; i < 6; i++)
+	raster_buf->geotransform[i] = 0;
     raster_buf->compress = 0;
 
     return raster_buf;
@@ -32,11 +35,8 @@ struct raster_map *init_raster(int nrows, int ncols, int type)
 
 void free_raster(struct raster_map *raster_buf)
 {
-    raster_buf->type = 0;
     free(raster_buf->cells.v);
-    raster_buf->cells.v = NULL;
     free(raster_buf->projection);
-    raster_buf->projection = NULL;
 }
 
 void copy_raster_metadata(struct raster_map *dest_buf,
@@ -70,6 +70,7 @@ struct raster_map *read_raster(const char *path, int type)
 
     band = GDALGetRasterBand(dataset, 1);
     raster_buf->null_value = GDALGetRasterNoDataValue(band, NULL);
+    raster_buf->compress = 0;
 
     switch (type) {
     case RASTER_MAP_TYPE_UINT32:
