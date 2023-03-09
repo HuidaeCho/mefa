@@ -58,8 +58,7 @@ struct raster_map *read_raster(const char *path, int type)
     size_t row_size;
     int row;
 
-    dataset = GDALOpen(path, GA_ReadOnly);
-    if (!dataset)
+    if (!(dataset = GDALOpen(path, GA_ReadOnly)))
         return NULL;
 
     raster_buf = malloc(sizeof *raster_buf);
@@ -120,18 +119,6 @@ int write_raster(const char *path, struct raster_map *raster_buf)
     if (raster_buf->compress)
         options = CSLSetNameValue(options, "COMPRESS", "LZW");
 
-    dataset =
-        GDALCreate(driver, path, raster_buf->ncols, raster_buf->nrows, 1,
-                   GDT_Int32, options);
-    if (!dataset)
-        return 3;
-
-    GDALSetProjection(dataset, raster_buf->projection);
-    GDALSetGeoTransform(dataset, raster_buf->geotransform);
-
-    band = GDALGetRasterBand(dataset, 1);
-    GDALSetRasterNoDataValue(band, raster_buf->null_value);
-
     row_size = raster_buf->ncols;
 
     switch (raster_buf->type) {
@@ -147,6 +134,18 @@ int write_raster(const char *path, struct raster_map *raster_buf)
         gdt_type = GDT_Byte;
         break;
     }
+
+    if (!
+        (dataset =
+         GDALCreate(driver, path, raster_buf->ncols, raster_buf->nrows, 1,
+                    gdt_type, options)))
+        return 3;
+
+    GDALSetProjection(dataset, raster_buf->projection);
+    GDALSetGeoTransform(dataset, raster_buf->geotransform);
+
+    band = GDALGetRasterBand(dataset, 1);
+    GDALSetRasterNoDataValue(band, raster_buf->null_value);
 
     for (row = 0; row < raster_buf->nrows; row++) {
         if (GDALRasterIO
