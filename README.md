@@ -26,9 +26,9 @@ make -f Makefile.lessmem
 make -f Makefile.osgeo4w.lessmem
 ```
 
-There are many `accumulate-*.c` files with different suffixes ({**d**ynamic, **g**uided, **s**tatic scheduling}, {**c**ollapse, **n**o collapse}, {**a**tomic, **f**lush}, {**t**ail recursion, **w**hile}), but only `accumulate.c` is compiled. Code for the {**m**ore, **l**ess memory} variants is in the same file and uses the `USE_LESS_MEMORY` macro defined by `Makefile.lessmem` and `Makefile.osgeo4w.lessmem`. To compile a specific variant of MEFFA, copy the corresponding `accumulate-*.c` file to `accumulate.c` first. The default `accumulate.c` is `accumulate-dnf_t.c` since dnfmt is recommended.
+In the `extra` directory, there are many `accumulate-*.c` files with different suffixes ({**d**ynamic, **g**uided, **s**tatic scheduling}, {**c**ollapse, **n**o collapse}, {**a**tomic, **f**lush}, {**t**ail recursion, **w**hile}), but only `accumulate.c` is compiled. Code for the {**m**ore, **l**ess memory} variants is in the same file and uses the `USE_LESS_MEMORY` macro defined by `Makefile.lessmem` and `Makefile.osgeo4w.lessmem`. To compile a specific variant of MEFFA, copy the corresponding `accumulate-*.c` file to `accumulate.c` first. The default `accumulate.c` is `accumulate-dnf_t.c` since dnfmt is recommended.
 
-For example, to compile dcalt, copy ``accumulate-dca_t.c`` to ``accumulate.c`` and
+For example, to compile dcalt, copy `accumulate-dca_t.c` to `accumulate.c` and
 ```bash
 # on Un*x
 make -f Makefile.lessmem
