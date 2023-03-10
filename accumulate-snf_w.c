@@ -18,8 +18,8 @@
 #ifdef USE_LESS_MEMORY
 #define UP(row, col) FIND_UP(row, col)
 #else
-#define UP(row, col) up_map->cells.byte[(row) * ncols + (col)]
-static struct raster_map *up_map;
+#define UP(row, col) up_cells[(row) * ncols + (col)]
+static unsigned char *up_cells;
 #endif
 
 static int nrows, ncols;
@@ -35,7 +35,7 @@ void accumulate(struct raster_map *dir_map, struct raster_map *accum_map)
     ncols = dir_map->ncols;
 
 #ifndef USE_LESS_MEMORY
-    up_map = init_raster(nrows, ncols, dir_map->type);
+    up_cells = calloc(nrows * ncols, sizeof *up_cells);
 
 #pragma omp parallel for schedule(static) private(col)
     for (row = 0; row < nrows; row++) {
@@ -55,7 +55,7 @@ void accumulate(struct raster_map *dir_map, struct raster_map *accum_map)
     }
 
 #ifndef USE_LESS_MEMORY
-    free_raster(up_map);
+    free(up_cells);
 #endif
 }
 
