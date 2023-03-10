@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #include "global.h"
 
 #define DIR_NULL (unsigned char)dir_map->null_value
