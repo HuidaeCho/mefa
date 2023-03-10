@@ -4,14 +4,14 @@
 
 struct raster_map *init_raster(int nrows, int ncols, int type)
 {
-    struct raster_map *raster_buf;
+    struct raster_map *rast_map;
     size_t row_size;
     int i;
 
-    raster_buf = malloc(sizeof *raster_buf);
-    raster_buf->nrows = nrows;
-    raster_buf->ncols = row_size = ncols;
-    raster_buf->type = type;
+    rast_map = malloc(sizeof *rast_map);
+    rast_map->nrows = nrows;
+    rast_map->ncols = row_size = ncols;
+    rast_map->type = type;
 
     switch (type) {
     case RASTER_MAP_TYPE_UINT32:
@@ -22,36 +22,36 @@ struct raster_map *init_raster(int nrows, int ncols, int type)
         break;
     }
 
-    raster_buf->cells.v = calloc(nrows, row_size);
+    rast_map->cells.v = calloc(nrows, row_size);
 
-    raster_buf->null_value = 0;
-    raster_buf->projection = NULL;
+    rast_map->null_value = 0;
+    rast_map->projection = NULL;
     for (i = 0; i < 6; i++)
-	raster_buf->geotransform[i] = 0;
-    raster_buf->compress = 0;
+        rast_map->geotransform[i] = 0;
+    rast_map->compress = 0;
 
-    return raster_buf;
+    return rast_map;
 }
 
-void free_raster(struct raster_map *raster_buf)
+void free_raster(struct raster_map *rast_map)
 {
-    free(raster_buf->cells.v);
-    free(raster_buf->projection);
+    free(rast_map->cells.v);
+    free(rast_map->projection);
 }
 
-void copy_raster_metadata(struct raster_map *dest_buf,
-                          const struct raster_map *src_buf)
+void copy_raster_metadata(struct raster_map *dest_map,
+                          const struct raster_map *src_map)
 {
     int i;
 
-    dest_buf->projection = strdup(src_buf->projection);
+    dest_map->projection = strdup(src_map->projection);
     for (i = 0; i < 6; i++)
-        dest_buf->geotransform[i] = src_buf->geotransform[i];
+        dest_map->geotransform[i] = src_map->geotransform[i];
 }
 
 struct raster_map *read_raster(const char *path, int type)
 {
-    struct raster_map *raster_buf;
+    struct raster_map *rast_map;
     GDALDatasetH dataset;
     GDALRasterBandH band;
     GDALDataType gdt_type;
@@ -61,16 +61,16 @@ struct raster_map *read_raster(const char *path, int type)
     if (!(dataset = GDALOpen(path, GA_ReadOnly)))
         return NULL;
 
-    raster_buf = malloc(sizeof *raster_buf);
-    raster_buf->type = type;
-    raster_buf->nrows = GDALGetRasterYSize(dataset);
-    raster_buf->ncols = row_size = GDALGetRasterXSize(dataset);
-    raster_buf->projection = strdup(GDALGetProjectionRef(dataset));
-    GDALGetGeoTransform(dataset, raster_buf->geotransform);
+    rast_map = malloc(sizeof *rast_map);
+    rast_map->type = type;
+    rast_map->nrows = GDALGetRasterYSize(dataset);
+    rast_map->ncols = row_size = GDALGetRasterXSize(dataset);
+    rast_map->projection = strdup(GDALGetProjectionRef(dataset));
+    GDALGetGeoTransform(dataset, rast_map->geotransform);
 
     band = GDALGetRasterBand(dataset, 1);
-    raster_buf->null_value = GDALGetRasterNoDataValue(band, NULL);
-    raster_buf->compress = 0;
+    rast_map->null_value = GDALGetRasterNoDataValue(band, NULL);
+    rast_map->compress = 0;
 
     switch (type) {
     case RASTER_MAP_TYPE_UINT32:
@@ -86,21 +86,21 @@ struct raster_map *read_raster(const char *path, int type)
         break;
     }
 
-    raster_buf->cells.v = malloc(raster_buf->nrows * row_size);
-    for (row = 0; row < raster_buf->nrows; row++) {
+    rast_map->cells.v = malloc(rast_map->nrows * row_size);
+    for (row = 0; row < rast_map->nrows; row++) {
         if (GDALRasterIO
-            (band, GF_Read, 0, row, raster_buf->ncols, 1,
-             (char *)raster_buf->cells.v + row * row_size, raster_buf->ncols,
+            (band, GF_Read, 0, row, rast_map->ncols, 1,
+             (char *)rast_map->cells.v + row * row_size, rast_map->ncols,
              1, gdt_type, 0, 0) != CE_None)
             return NULL;
     }
 
     GDALClose(dataset);
 
-    return raster_buf;
+    return rast_map;
 }
 
-int write_raster(const char *path, struct raster_map *raster_buf)
+int write_raster(const char *path, struct raster_map *rast_map)
 {
     GDALDriverH driver = GDALGetDriverByName("GTiff");
     char **metadata, **options = NULL;
@@ -117,12 +117,12 @@ int write_raster(const char *path, struct raster_map *raster_buf)
     if (!CSLFetchBoolean(metadata, GDAL_DCAP_CREATE, FALSE))
         return 2;
 
-    if (raster_buf->compress)
+    if (rast_map->compress)
         options = CSLSetNameValue(options, "COMPRESS", "LZW");
 
-    row_size = raster_buf->ncols;
+    row_size = rast_map->ncols;
 
-    switch (raster_buf->type) {
+    switch (rast_map->type) {
     case RASTER_MAP_TYPE_UINT32:
         gdt_type = GDT_UInt32;
         row_size *= sizeof(unsigned int);
@@ -138,20 +138,20 @@ int write_raster(const char *path, struct raster_map *raster_buf)
 
     if (!
         (dataset =
-         GDALCreate(driver, path, raster_buf->ncols, raster_buf->nrows, 1,
+         GDALCreate(driver, path, rast_map->ncols, rast_map->nrows, 1,
                     gdt_type, options)))
         return 3;
 
-    GDALSetProjection(dataset, raster_buf->projection);
-    GDALSetGeoTransform(dataset, raster_buf->geotransform);
+    GDALSetProjection(dataset, rast_map->projection);
+    GDALSetGeoTransform(dataset, rast_map->geotransform);
 
     band = GDALGetRasterBand(dataset, 1);
-    GDALSetRasterNoDataValue(band, raster_buf->null_value);
+    GDALSetRasterNoDataValue(band, rast_map->null_value);
 
-    for (row = 0; row < raster_buf->nrows; row++) {
+    for (row = 0; row < rast_map->nrows; row++) {
         if (GDALRasterIO
-            (band, GF_Write, 0, row, raster_buf->ncols, 1,
-             (char *)raster_buf->cells.v + row * row_size, raster_buf->ncols,
+            (band, GF_Write, 0, row, rast_map->ncols, 1,
+             (char *)rast_map->cells.v + row * row_size, rast_map->ncols,
              1, gdt_type, 0, 0) != CE_None)
             return 4;
     }

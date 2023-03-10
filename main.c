@@ -13,7 +13,7 @@
 int main(int argc, char *argv[])
 {
     char *dir_path, *accum_path;
-    struct raster_map *dir_buf, *accum_buf;
+    struct raster_map *dir_map, *accum_map;
     int nrows, ncols;
     struct timeval start_time, end_time;
 
@@ -21,7 +21,8 @@ int main(int argc, char *argv[])
         printf("Usage: meffa dir.tif accum.tif\n");
         printf("\n");
         printf("  dir.tif\tInput GeoTIFF file of flow direction raster\n");
-        printf("  accum.tif\tOutput GeoTIFF file for flow accumulation raster\n");
+        printf
+            ("  accum.tif\tOutput GeoTIFF file for flow accumulation raster\n");
         exit(EXIT_SUCCESS);
     }
 
@@ -32,7 +33,7 @@ int main(int argc, char *argv[])
 
     printf("Reading flow direction raster <%s>...\n", dir_path);
     gettimeofday(&start_time, NULL);
-    if (!(dir_buf = read_raster(dir_path, RASTER_MAP_TYPE_BYTE))) {
+    if (!(dir_map = read_raster(dir_path, RASTER_MAP_TYPE_BYTE))) {
         printf("%s: Failed to read flow direction raster\n", dir_path);
         exit(EXIT_FAILURE);
     }
@@ -40,30 +41,30 @@ int main(int argc, char *argv[])
     printf("Input time for flow direction: %lld microsec\n",
            timeval_diff(NULL, &end_time, &start_time));
 
-    nrows = dir_buf->nrows;
-    ncols = dir_buf->ncols;
-    accum_buf = init_raster(nrows, ncols, RASTER_MAP_TYPE_UINT32);
-    copy_raster_metadata(accum_buf, dir_buf);
+    nrows = dir_map->nrows;
+    ncols = dir_map->ncols;
+    accum_map = init_raster(nrows, ncols, RASTER_MAP_TYPE_UINT32);
+    copy_raster_metadata(accum_map, dir_map);
 
     printf("Accumulating flows...\n");
     gettimeofday(&start_time, NULL);
-    accumulate(dir_buf, accum_buf);
+    accumulate(dir_map, accum_map);
     gettimeofday(&end_time, NULL);
     printf("Computation time for flow accumulation: %lld microsec\n",
            timeval_diff(NULL, &end_time, &start_time));
-    free_raster(dir_buf);
+    free_raster(dir_map);
 
     printf("Writing flow accumulation raster <%s>...\n", accum_path);
     gettimeofday(&start_time, NULL);
-    if (write_raster(accum_path, accum_buf) > 0) {
+    if (write_raster(accum_path, accum_map) > 0) {
         printf("%s: Failed to write flow accumulation raster\n", accum_path);
-        free_raster(accum_buf);
+        free_raster(accum_map);
         exit(EXIT_FAILURE);
     }
     gettimeofday(&end_time, NULL);
     printf("Output time for flow accumulation: %lld microsec\n",
            timeval_diff(NULL, &end_time, &start_time));
-    free_raster(accum_buf);
+    free_raster(accum_map);
 
     exit(EXIT_SUCCESS);
 }

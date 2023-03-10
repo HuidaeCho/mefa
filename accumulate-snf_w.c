@@ -1,8 +1,8 @@
 #include "global.h"
 
-#define DIR_NULL (unsigned char)dir_buf->null_value
-#define DIR(row, col) dir_buf->cells.byte[(row) * ncols + (col)]
-#define ACCUM(row, col) accum_buf->cells.uint32[(row) * ncols + (col)]
+#define DIR_NULL (unsigned char)dir_map->null_value
+#define DIR(row, col) dir_map->cells.byte[(row) * ncols + (col)]
+#define ACCUM(row, col) accum_map->cells.uint32[(row) * ncols + (col)]
 #define FIND_UP(row, col) ( \
         (row > 0 ? \
          (col > 0 && DIR(row - 1, col - 1) == SE ? NW : 0) | \
@@ -18,8 +18,8 @@
 #ifdef USE_LESS_MEMORY
 #define UP(row, col) FIND_UP(row, col)
 #else
-#define UP(row, col) up_buf->cells.byte[(row) * ncols + (col)]
-static struct raster_map *up_buf;
+#define UP(row, col) up_map->cells.byte[(row) * ncols + (col)]
+static struct raster_map *up_map;
 #endif
 
 static int nrows, ncols;
@@ -27,15 +27,15 @@ static int nrows, ncols;
 static void trace_down(struct raster_map *, struct raster_map *, int, int);
 static int sum_up(struct raster_map *, int, int, int);
 
-void accumulate(struct raster_map *dir_buf, struct raster_map *accum_buf)
+void accumulate(struct raster_map *dir_map, struct raster_map *accum_map)
 {
     int row, col;
 
-    nrows = dir_buf->nrows;
-    ncols = dir_buf->ncols;
+    nrows = dir_map->nrows;
+    ncols = dir_map->ncols;
 
 #ifndef USE_LESS_MEMORY
-    up_buf = init_raster(nrows, ncols, dir_buf->type);
+    up_map = init_raster(nrows, ncols, dir_map->type);
 
 #pragma omp parallel for schedule(static) private(col)
     for (row = 0; row < nrows; row++) {
@@ -51,16 +51,16 @@ void accumulate(struct raster_map *dir_buf, struct raster_map *accum_buf)
             /* if the current cell is not null and has no upstream cells, start
              * tracing down */
             if (DIR(row, col) != DIR_NULL && !UP(row, col))
-                trace_down(dir_buf, accum_buf, row, col);
+                trace_down(dir_map, accum_map, row, col);
     }
 
 #ifndef USE_LESS_MEMORY
-    free_raster(up_buf);
+    free_raster(up_map);
 #endif
 }
 
-static void trace_down(struct raster_map *dir_buf,
-                       struct raster_map *accum_buf, int row, int col)
+static void trace_down(struct raster_map *dir_map,
+                       struct raster_map *accum_map, int row, int col)
 {
     int up, accum_up = 0;
 
@@ -103,16 +103,16 @@ static void trace_down(struct raster_map *dir_buf,
          * cell have never been visited, stop tracing down */
     } while (row >= 0 && row < nrows && col >= 0 && col < ncols &&
              DIR(row, col) != DIR_NULL && (up = UP(row, col)) &&
-             (accum_up = sum_up(accum_buf, row, col, up)));
+             (accum_up = sum_up(accum_map, row, col, up)));
 }
 
 /* if any upstream cells have never been visited, 0 is returned; otherwise, the
  * sum of upstream accumulation is returned */
-static int sum_up(struct raster_map *accum_buf, int row, int col, int up)
+static int sum_up(struct raster_map *accum_map, int row, int col, int up)
 {
     int sum = 0, accum;
 
-#pragma omp flush(accum_buf)
+#pragma omp flush(accum_map)
     if (up & NW) {
         if (!(accum = ACCUM(row - 1, col - 1)))
             return 0;
