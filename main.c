@@ -18,7 +18,7 @@ int main(int argc, char *argv[])
     struct timeval start_time, end_time;
 
     if (argc != 3) {
-        printf("Usage: reflow dir.tif accum.tif\n");
+        printf("Usage: meffa dir.tif accum.tif\n");
         printf("\n");
         printf("  dir.tif\tInput flow direction raster in ArcGIS encoding\n");
         printf("  accum.tif\tOutput flow accumulation raster\n");
