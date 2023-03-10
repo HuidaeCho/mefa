@@ -39,6 +39,9 @@ struct raster_map
     int compress;
 };
 
+/* timeval_diff.c */
+long long timeval_diff(struct timeval *, struct timeval *, struct timeval *);
+
 /* raster.c */
 struct raster_map *init_raster(int, int, int);
 void free_raster(struct raster_map *);
@@ -48,8 +51,5 @@ int write_raster(const char *, struct raster_map *);
 
 /* accumulate.c */
 void accumulate(struct raster_map *, struct raster_map *);
-
-/* timeval_diff.c */
-long long timeval_diff(struct timeval *, struct timeval *, struct timeval *);
 
 #endif
