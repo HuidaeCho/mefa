@@ -20,8 +20,8 @@ int main(int argc, char *argv[])
     if (argc != 3) {
         printf("Usage: meffa dir.tif accum.tif\n");
         printf("\n");
-        printf("  dir.tif\tInput flow direction raster in ArcGIS encoding\n");
-        printf("  accum.tif\tOutput flow accumulation raster\n");
+        printf("  dir.tif\tInput GeoTIFF file of flow direction raster\n");
+        printf("  accum.tif\tOutput GeoTIFF file for flow accumulation raster\n");
         exit(EXIT_SUCCESS);
     }
 
