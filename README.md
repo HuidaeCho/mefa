@@ -3,7 +3,9 @@
 A manuscript is submitted to [the Environmental Modelling and Software journal](https://www.sciencedirect.com/journal/environmental-modelling-and-software).
 
 ![image](https://user-images.githubusercontent.com/7456117/230541813-893662a5-c10e-480c-931e-4de65f20f230.png)
-* 30-m NED for the entire Texas
+* Raw data: 30-m NED for the entire Texas
+  * 1.8 billion cells including null
+  * 773 million cells without null
 * Red: MEFFA
 * Blue and purple: Benchmark algorithms
 
