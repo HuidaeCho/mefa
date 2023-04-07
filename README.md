@@ -9,6 +9,9 @@ A manuscript is submitted to [the Environmental Modelling and Software journal](
 * Red: MEFFA
 * Blue and purple: Benchmark algorithms
 
+Flow direction encoding in GeoTIFF:<br>
+<img src="https://idea.isnew.info/how-to-import-arcgis-flow-direction-into-grass-gis/arcgis-fdr.svg" width="300">
+
 ## Requirements
 
 * C compiler with [OpenMP](https://www.openmp.org/) support
