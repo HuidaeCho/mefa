@@ -3,6 +3,7 @@
 A manuscript is submitted to [the Environmental Modelling and Software journal](https://www.sciencedirect.com/journal/environmental-modelling-and-software).
 
 ![image](https://user-images.githubusercontent.com/7456117/230541813-893662a5-c10e-480c-931e-4de65f20f230.png)
+* 30-m NED for the entire Texas
 * Red: MEFFA
 * Blue and purple: Benchmark algorithms
 
