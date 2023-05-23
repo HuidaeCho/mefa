@@ -1,4 +1,4 @@
-# Memory-Efficient Fast Flow Accumulation (MEFFA)
+# Memory-Efficient Flow Accumulation (MEFA)
 
 A manuscript is submitted to [the Environmental Modelling and Software journal](https://www.sciencedirect.com/journal/environmental-modelling-and-software).
 
