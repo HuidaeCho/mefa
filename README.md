@@ -6,7 +6,7 @@ A manuscript is submitted to [the Environmental Modelling and Software journal](
 * Raw data: 30-m NED for the entire Texas
   * 1.8 billion cells including null
   * 773 million cells without null
-* Red: MEFFA
+* Red: MEFA
 * Blue and purple: Benchmark algorithms
 
 Flow direction encoding in GeoTIFF:<br>
@@ -19,7 +19,7 @@ Flow direction encoding in GeoTIFF:<br>
 
 For Windows, use [MSYS2](https://www.msys2.org/) and [OSGeo4W](https://trac.osgeo.org/osgeo4w/) to install [GCC](https://gcc.gnu.org/) and [GDAL](https://gdal.org/), respectively.
 
-## How to compile MEFFA
+## How to compile MEFA
 
 On Un*x, use `Makefile` for more-memory versions or `Makefile.lessmem` for less-memory versions. Similarly, on Windows, use `Makefile.osgeo4w` and `Makefile.osgeo4w.lessmem` for more- and less-memory versions, respectively. To compile a more-memory variant,
 ```bash
@@ -36,7 +36,7 @@ make -f Makefile.lessmem
 make -f Makefile.osgeo4w.lessmem
 ```
 
-In the `extra` directory, there are many `accumulate-*.c` files with different suffixes ({**d**ynamic, **g**uided, **s**tatic scheduling}, {**c**ollapse, **n**o collapse}, {**a**tomic, **f**lush}, {**t**ail recursion, **w**hile}), but only `accumulate.c` is compiled. Code for the {**m**ore, **l**ess memory} variants is in the same file and uses the `USE_LESS_MEMORY` macro defined by `Makefile.lessmem` and `Makefile.osgeo4w.lessmem`. To compile a specific variant of MEFFA, copy the corresponding `accumulate-*.c` file to `accumulate.c` first. The default `accumulate.c` is `accumulate-dnf_t.c` since dnfmt is recommended.
+In the `extra` directory, there are many `accumulate-*.c` files with different suffixes ({**d**ynamic, **g**uided, **s**tatic scheduling}, {**c**ollapse, **n**o collapse}, {**a**tomic, **f**lush}, {**t**ail recursion, **w**hile}), but only `accumulate.c` is compiled. Code for the {**m**ore, **l**ess memory} variants is in the same file and uses the `USE_LESS_MEMORY` macro defined by `Makefile.lessmem` and `Makefile.osgeo4w.lessmem`. To compile a specific variant of MEFA, copy the corresponding `accumulate-*.c` file to `accumulate.c` first. The default `accumulate.c` is `accumulate-dnf_t.c` since dnfmt is recommended.
 
 For example, to compile dcalt, copy `accumulate-dca_t.c` to `accumulate.c` and
 ```bash
@@ -48,7 +48,7 @@ make -f Makefile.osgeo4w.lessmem
 
 ## Benchmark algorithms
 
-* [MEFFA-HP](https://github.com/HuidaeCho/high_performance_flow_accumulation) (algorithm index 7)
+* [MEFA-HP](https://github.com/HuidaeCho/high_performance_flow_accumulation) (algorithm index 7)
 * [HPFA](https://github.com/HuidaeCho/high_performance_flow_accumulation) (algorithm index 1)
 * [FastFlow](https://github.com/HuidaeCho/FastFlow) (Zhou's algorithm)
 * [AreaD8](https://github.com/dtarb/TauDEM)
@@ -56,24 +56,24 @@ make -f Makefile.osgeo4w.lessmem
 
 ## Pre-/post-processing scripts
 
-* [1.import_ned.zip](https://data.isnew.info/meffa/1.import_ned.zip)
-* [2.prepare_inputs.zip](https://data.isnew.info/meffa/2.prepare_inputs.zip)
-* [3.run_algorithms.zip](https://data.isnew.info/meffa/3.run_algorithms.zip)
-* [4.check_outputs.zip](https://data.isnew.info/meffa/4.check_outputs.zip)
-* [5.analyze_outputs.zip](https://data.isnew.info/meffa/5.analyze_outputs.zip)
+* [1.import_ned.zip](https://data.isnew.info/mefa/1.import_ned.zip)
+* [2.prepare_inputs.zip](https://data.isnew.info/mefa/2.prepare_inputs.zip)
+* [3.run_algorithms.zip](https://data.isnew.info/mefa/3.run_algorithms.zip)
+* [4.check_outputs.zip](https://data.isnew.info/mefa/4.check_outputs.zip)
+* [5.analyze_outputs.zip](https://data.isnew.info/mefa/5.analyze_outputs.zip)
 
 ## Data
 
 Input flow direction files
 
-* [taud8.tif](https://data.isnew.info/meffa/taud8.tif): AreaD8
-* [fdr.tif](https://data.isnew.info/meffa/fdr.tif): Other algorithms
+* [taud8.tif](https://data.isnew.info/mefa/taud8.tif): AreaD8
+* [fdr.tif](https://data.isnew.info/mefa/fdr.tif): Other algorithms
 
 Output flow accumulation files
 
-* [meac.tif](https://data.isnew.info/meffa/meac.tif): MEFFA
-* [meffahp.tif](https://data.isnew.info/meffa/meffahp.tif): MEFFA-HP
-* [hpfa.tif](https://data.isnew.info/meffa/hpfa.tif): HPFA
-* [ffaczhou.tif](https://data.isnew.info/meffa/ffaczhou.tif): FastFlow
-* [tauad801.tif](https://data.isnew.info/meffa/tauad801.tif): AreaD8
-* [fac.tif](https://data.isnew.info/meffa/fac.tif): ArcGIS
+* [meac.tif](https://data.isnew.info/mefa/meac.tif): MEFA
+* [mefahp.tif](https://data.isnew.info/mefa/mefahp.tif): MEFA-HP
+* [hpfa.tif](https://data.isnew.info/mefa/hpfa.tif): HPFA
+* [ffaczhou.tif](https://data.isnew.info/mefa/ffaczhou.tif): FastFlow
+* [tauad801.tif](https://data.isnew.info/mefa/tauad801.tif): AreaD8
+* [fac.tif](https://data.isnew.info/mefa/fac.tif): ArcGIS

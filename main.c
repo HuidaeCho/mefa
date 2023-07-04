@@ -18,7 +18,7 @@ int main(int argc, char *argv[])
     struct timeval start_time, end_time;
 
     if (argc != 3) {
-        printf("Usage: meffa dir.tif accum.tif\n");
+        printf("Usage: mefa dir.tif accum.tif\n");
         printf("\n");
         printf("  dir.tif\tInput GeoTIFF file of flow direction raster\n");
         printf
