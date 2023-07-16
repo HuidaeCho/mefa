@@ -66,14 +66,14 @@ make -f Makefile.osgeo4w.lessmem
 
 Input flow direction files
 
-* [taud8.tif](https://data.isnew.info/mefa/taud8.tif): AreaD8
-* [fdr.tif](https://data.isnew.info/mefa/fdr.tif): Other algorithms
+* [taud8.tif](https://data.isnew.info/mefa/taud8.zip): AreaD8
+* [fdr.tif](https://data.isnew.info/mefa/fdr.zip): Other algorithms
 
 Output flow accumulation files
 
-* [meac.tif](https://data.isnew.info/mefa/meac.tif): MEFA
-* [mefahp.tif](https://data.isnew.info/mefa/mefahp.tif): MEFA-HP
-* [hpfa.tif](https://data.isnew.info/mefa/hpfa.tif): HPFA
-* [ffaczhou.tif](https://data.isnew.info/mefa/ffaczhou.tif): FastFlow
-* [tauad801.tif](https://data.isnew.info/mefa/tauad801.tif): AreaD8
-* [fac.tif](https://data.isnew.info/mefa/fac.tif): ArcGIS
+* [meac.tif](https://data.isnew.info/mefa/meac.zip): MEFA
+* [mefahp.tif](https://data.isnew.info/mefa/mefahp.zip): MEFA-HP
+* [hpfa.tif](https://data.isnew.info/mefa/hpfa.zip): HPFA
+* [ffaczhou.tif](https://data.isnew.info/mefa/ffaczhou.zip): FastFlow
+* [tauad801.tif](https://data.isnew.info/mefa/tauad801.zip): AreaD8
+* [fac.tif](https://data.isnew.info/mefa/fac.zip): ArcGIS
