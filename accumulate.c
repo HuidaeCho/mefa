@@ -2,8 +2,8 @@
 #include "global.h"
 
 #define DIR_NULL (unsigned char)dir_map->null_value
-#define DIR(row, col) dir_map->cells.byte[(row) * ncols + (col)]
-#define ACCUM(row, col) accum_map->cells.uint32[(row) * ncols + (col)]
+#define DIR(row, col) dir_map->cells.byte[(size_t)(row) * ncols + (col)]
+#define ACCUM(row, col) accum_map->cells.uint32[(size_t)(row) * ncols + (col)]
 #define FIND_UP(row, col) ( \
         (row > 0 ? \
          (col > 0 && DIR(row - 1, col - 1) == SE ? NW : 0) | \
@@ -19,7 +19,7 @@
 #ifdef USE_LESS_MEMORY
 #define UP(row, col) FIND_UP(row, col)
 #else
-#define UP(row, col) up_cells[(row) * ncols + (col)]
+#define UP(row, col) up_cells[(size_t)(row) * ncols + (col)]
 static unsigned char *up_cells;
 #endif
 
@@ -37,7 +37,7 @@ void accumulate(struct raster_map *dir_map, struct raster_map *accum_map)
     ncols = dir_map->ncols;
 
 #ifndef USE_LESS_MEMORY
-    up_cells = calloc(nrows * ncols, sizeof *up_cells);
+    up_cells = calloc((size_t)nrows * ncols, sizeof *up_cells);
 
 #pragma omp parallel for schedule(dynamic) private(col)
     for (row = 0; row < nrows; row++) {
