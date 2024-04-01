@@ -14,7 +14,6 @@ int main(int argc, char *argv[])
 {
     char *dir_path, *accum_path;
     struct raster_map *dir_map, *accum_map;
-    int nrows, ncols;
     struct timeval start_time, end_time;
 
     if (argc != 3) {
@@ -41,9 +40,8 @@ int main(int argc, char *argv[])
     printf("Input time for flow direction: %lld microsec\n",
            timeval_diff(NULL, &end_time, &start_time));
 
-    nrows = dir_map->nrows;
-    ncols = dir_map->ncols;
-    accum_map = init_raster(nrows, ncols, RASTER_MAP_TYPE_UINT32);
+    accum_map =
+        init_raster(dir_map->nrows, dir_map->ncols, RASTER_MAP_TYPE_UINT32);
     copy_raster_metadata(accum_map, dir_map);
 
     printf("Accumulating flows...\n");
