@@ -27,7 +27,7 @@ static int nrows, ncols;
 
 static void trace_down(struct raster_map *, struct raster_map *, int, int,
                        int);
-static int sum_up(struct raster_map *, int, int);
+static int sum_up(struct raster_map *, struct raster_map *, int, int);
 
 void accumulate(struct raster_map *dir_map, struct raster_map *accum_map)
 {
@@ -106,7 +106,7 @@ static void trace_down(struct raster_map *dir_map,
      * cell have never been visited, stop tracing down */
     if (row < 0 || row >= nrows || col < 0 || col >= ncols ||
         DIR(row, col) == DIR_NULL ||
-        !(accum_up = sum_up(accum_map, row, col)))
+        !(accum_up = sum_up(dir_map, accum_map, row, col)))
         return;
 
     /* use gcc -O2 or -O3 flags for tail-call optimization
@@ -116,7 +116,8 @@ static void trace_down(struct raster_map *dir_map,
 
 /* if any upstream cells have never been visited, 0 is returned; otherwise, the
  * sum of upstream accumulation is returned */
-static int sum_up(struct raster_map *accum_map, int row, int col)
+static int sum_up(struct raster_map *dir_map, struct raster_map *accum_map,
+                  int row, int col)
 {
     int up = UP(row, col);
     int sum = 0, accum;
