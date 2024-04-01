@@ -1,12 +1,12 @@
 CFLAGS=-Wall -Werror -O3 -fopenmp -DUSE_LESS_MEMORY
 LDFLAGS=-O3 -fopenmp
 
-all: mefa
+all: mefa-lessmem
 
 clean:
 	$(RM) *.o
 
-mefa: main.o raster.o accumulate.o timeval_diff.o
+mefa-lessmem: main.o raster.o accumulate.o timeval_diff.o
 	$(CC) $(LDFLAGS) -o $@ $^ `gdal-config --libs`
 
 %.o: %.c
