@@ -23,6 +23,12 @@ int gettimeofday(struct timeval *, struct timezone *);
 long long timeval_diff(struct timeval *, struct timeval *, struct timeval *);
 
 /* accumulate.c */
-void accumulate(struct raster_map *, struct raster_map *);
+void accumulate(struct raster_map *, struct raster_map *, int);
+
+/* accumulate_lessmem.c */
+void accumulate_lessmem(struct raster_map *, struct raster_map *);
+
+/* accumulate_moremem.c */
+void accumulate_moremem(struct raster_map *, struct raster_map *);
 
 #endif
