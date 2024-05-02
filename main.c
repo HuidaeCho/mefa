@@ -54,7 +54,7 @@ int main(int argc, char *argv[])
 
     printf("Writing flow accumulation raster <%s>...\n", accum_path);
     gettimeofday(&start_time, NULL);
-    if (write_raster(accum_path, accum_map) > 0) {
+    if (write_raster(accum_path, accum_map, RASTER_MAP_TYPE_AUTO) > 0) {
         printf("%s: Failed to write flow accumulation raster\n", accum_path);
         free_raster(accum_map);
         exit(EXIT_FAILURE);
