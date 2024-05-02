@@ -1,35 +1,47 @@
+#include <math.h>
 #include <gdal.h>
 #include <cpl_string.h>
 #include <omp.h>
-#include "global.h"
+#include "raster.h"
 
-void print_raster(const char *path, const char *fmt, const char *null_str)
+void print_raster(const char *path, const char *null_str, const char *fmt)
 {
     struct raster_map *rast_map;
+    int width;
     char format[128];
     int row, col;
 
-    if (!(rast_map = read_raster(path, RASTER_MAP_TYPE_AUTO)))
+    if (!(rast_map = read_raster(path, RASTER_MAP_TYPE_AUTO, 1)))
         return;
+
+    width = (int)log10(rast_map->max) + 1;
+
+    if (null_str) {
+        int w = strlen(null_str);
+
+        if (w > width)
+            width = w;
+    }
 
     if (fmt)
         sprintf(format, "%s%%s", fmt);
     else {
+
         switch (rast_map->type) {
         case RASTER_MAP_TYPE_FLOAT64:
-            sprintf(format, "%%lf%%s");
+            sprintf(format, "%%%d.%dlf%%s", width + 4, 3);
             break;
         case RASTER_MAP_TYPE_FLOAT32:
-            sprintf(format, "%%f%%s");
+            sprintf(format, "%%%d.%df%%s", width + 4, 3);
             break;
         case RASTER_MAP_TYPE_UINT32:
-            sprintf(format, "%%u%%s");
+            sprintf(format, "%%%du%%s", width);
             break;
         case RASTER_MAP_TYPE_INT32:
-            sprintf(format, "%%d%%s");
+            sprintf(format, "%%%dd%%s", width);
             break;
         default:
-            sprintf(format, "%%d%%s");
+            sprintf(format, "%%%dd%%s", width);
             break;
         }
     }
@@ -40,7 +52,7 @@ void print_raster(const char *path, const char *fmt, const char *null_str)
             char *sep = col < rast_map->ncols - 1 ? " " : "";
 
             if (null_str && is_null(rast_map, row, col))
-                printf("%s%s", null_str, sep);
+                printf("%*s%s", width, null_str, sep);
             else
                 switch (rast_map->type) {
                 case RASTER_MAP_TYPE_FLOAT64:
@@ -148,7 +160,7 @@ void copy_raster_metadata(struct raster_map *dest_map,
     dest_map->dy = src_map->dy;
 }
 
-struct raster_map *read_raster(const char *path, int type)
+struct raster_map *read_raster(const char *path, int type, int get_stats)
 {
     struct raster_map *rast_map;
     GDALDatasetH *datasets, dataset;
@@ -168,7 +180,7 @@ struct raster_map *read_raster(const char *path, int type)
     if (!(dataset = datasets[0]))
         return NULL;
 
-    rast_map = malloc(sizeof *rast_map);
+    rast_map = calloc(1, sizeof *rast_map);
     rast_map->nrows = GDALGetRasterYSize(dataset);
     rast_map->ncols = row_size = GDALGetRasterXSize(dataset);
     rast_map->projection = strdup(GDALGetProjectionRef(dataset));
@@ -185,6 +197,12 @@ struct raster_map *read_raster(const char *path, int type)
     }
 
     band = bands[0];
+    if (get_stats) {
+        rast_map->has_stats = 1;
+        GDALGetRasterStatistics(band, 0, 1, &rast_map->min, &rast_map->max,
+                                &rast_map->mean, &rast_map->sd);
+    }
+
     rast_map->null_value = GDALGetRasterNoDataValue(band, NULL);
     rast_map->compress = 0;
 

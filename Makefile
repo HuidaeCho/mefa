@@ -7,7 +7,7 @@ else
 	GDALLIBS=`gdal-config --libs`
 	EXT=
 endif
-LDFLAGS=-O3 -fopenmp
+LDFLAGS=-O3 -fopenmp -lm
 
 all: mefa$(EXT)
 
