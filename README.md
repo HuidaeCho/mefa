@@ -4,7 +4,7 @@ Part of Memory-efficient Input Drainage paths Analysis System (MIDAS)
 
 Please cite [Cho (2023)](https://doi.org/10.1016/j.envsoft.2023.105771) when you use this algorithm or the [r.flowaccumulation](https://grass.osgeo.org/grass83/manuals/addons/r.flowaccumulation.html) [GRASS](https://grass.osgeo.org) addon.
 
-* Huidae Cho, July 2023. Memory-Efficient Flow Accumulation Using a Look-Around Approach and Its OpenMP Parallelization. Environmental Modelling & Software 167, 105771. doi:10.1016/j.envsoft.2023.105771.
+* Huidae Cho, July 2023. Memory-Efficient Flow Accumulation Using a Look-Around Approach and Its OpenMP Parallelization. Environmental Modelling & Software 167, 105771. [doi:10.1016/j.envsoft.2023.105771](https://doi.org/10.1016/j.envsoft.2023.105771).
 
 ![image](https://user-images.githubusercontent.com/7456117/230541813-893662a5-c10e-480c-931e-4de65f20f230.png)
 * Raw data: 30-m NED for the entire Texas
