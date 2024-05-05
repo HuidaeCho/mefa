@@ -14,7 +14,7 @@ Please cite [Cho (2023)](https://doi.org/10.1016/j.envsoft.2023.105771) when you
 * Blue and purple: Benchmark algorithms
 
 Flow direction encoding in GeoTIFF:<br>
-<img src="https://idea.isnew.info/how-to-import-arcgis-flow-direction-into-grass-gis/arcgis-fdr.svg" width="300">
+![fdr.png](fdr.png)
 
 ## Requirements
 
