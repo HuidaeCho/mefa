@@ -8,11 +8,26 @@ void print_raster(const char *path, const char *null_str, const char *fmt)
 {
     struct raster_map *rast_map;
     int width;
-    char format[128];
+    char format[128], *type_format;
     int row, col;
 
     if (!(rast_map = read_raster(path, RASTER_MAP_TYPE_AUTO, 1)))
         return;
+
+    switch (rast_map->type) {
+    case RASTER_MAP_TYPE_FLOAT64:
+        type_format = "lf";
+        break;
+    case RASTER_MAP_TYPE_FLOAT32:
+        type_format = "f";
+        break;
+    case RASTER_MAP_TYPE_UINT32:
+        type_format = "u";
+        break;
+    default:
+        type_format = "d";
+        break;
+    }
 
     width = (int)log10(rast_map->max) + 1;
 
@@ -23,25 +38,65 @@ void print_raster(const char *path, const char *null_str, const char *fmt)
             width = w;
     }
 
-    if (fmt)
-        sprintf(format, "%s%%s", fmt);
-    else {
+    if (fmt) {
+        char *p;
 
+        /* find a numeric format */
+        for (p = (char *)fmt; *p && *p != '%'; p++) ;
+        if (*p) {
+            char *prefix = (char *)fmt;
+            char *precision = "";
+
+            /* put 0 at the end of prefix */
+            *p = 0;
+
+            /* find width */
+            if (*(p + 1) >= '0' && *(p + 1) <= '9') {
+                int w = atoi(++p);
+
+                if (w > width)
+                    width = w;
+                /* skip the width */
+                for (p++; *p >= '0' && *p <= '9'; p++) ;
+                /* remember where the dot is if any */
+                if (*p == '.')
+                    /* skip precision */
+                    for (precision = p++; *p >= '0' && *p <= '9'; p++) ;
+            }
+            else
+                /* increase the width by the length of prefix */
+                width += p++ - fmt;
+            /* skip the type format */
+            if (*p == 'l' && *(p + 1) == 'f') {
+                /* put 0 at the end of precision */
+                *p = 0;
+                p += 2;
+            }
+            else {
+                /* put 0 at the end of precision */
+                *p = 0;
+                p++;
+            }
+            sprintf(format, "%s%%%d%s%s%s%%s", prefix, width, precision,
+                    type_format, p);
+        }
+        else {
+            int w = strlen(fmt);
+
+            if (w > width)
+                width = w;
+
+            sprintf(format, "%*s%%s", width, fmt);
+        }
+    }
+    else {
         switch (rast_map->type) {
         case RASTER_MAP_TYPE_FLOAT64:
-            sprintf(format, "%%%d.%dlf%%s", width + 4, 3);
-            break;
         case RASTER_MAP_TYPE_FLOAT32:
-            sprintf(format, "%%%d.%df%%s", width + 4, 3);
-            break;
-        case RASTER_MAP_TYPE_UINT32:
-            sprintf(format, "%%%du%%s", width);
-            break;
-        case RASTER_MAP_TYPE_INT32:
-            sprintf(format, "%%%dd%%s", width);
+            sprintf(format, "%%%d.%d%s%%s", width + 4, 3, type_format);
             break;
         default:
-            sprintf(format, "%%%dd%%s", width);
+            sprintf(format, "%%%d%s%%s", width, type_format);
             break;
         }
     }
@@ -53,7 +108,7 @@ void print_raster(const char *path, const char *null_str, const char *fmt)
 
             if (null_str && is_null(rast_map, row, col))
                 printf("%*s%s", width, null_str, sep);
-            else
+            else {
                 switch (rast_map->type) {
                 case RASTER_MAP_TYPE_FLOAT64:
                     printf(format, rast_map->cells.float64[idx], sep);
@@ -71,10 +126,10 @@ void print_raster(const char *path, const char *null_str, const char *fmt)
                     printf(format, rast_map->cells.byte[idx], sep);
                     break;
                 }
+            }
         }
         printf("\n");
     }
-
 
     free_raster(rast_map);
 }
