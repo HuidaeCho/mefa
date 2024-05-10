@@ -14,7 +14,7 @@ Please cite [Cho (2023)](https://doi.org/10.1016/j.envsoft.2023.105771) when you
 * Blue and purple: Benchmark algorithms
 
 Flow direction encoding in GeoTIFF:<br>
-![fdr.png](fdr.png)
+![image](https://github.com/HuidaeCho/mefa/assets/7456117/6268b904-24a4-482e-8f6d-9ec9c4edf143)
 
 ## Requirements
 
