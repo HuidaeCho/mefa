@@ -1,6 +1,6 @@
 # Memory-Efficient Flow Accumulation (MEFA)
 
-Part of the Memory-Efficient I/O-Improved Drainage Analysis System (MIDAS)
+Part of the [Memory-Efficient I/O-Improved DEM Analysis System (MIDAS)](https://github.com/HuidaeCho/midas)
 
 Please cite [Cho (2023)](https://doi.org/10.1016/j.envsoft.2023.105771) when you use this algorithm or the [r.flowaccumulation](https://grass.osgeo.org/grass83/manuals/addons/r.flowaccumulation.html) [GRASS](https://grass.osgeo.org) addon.
 
