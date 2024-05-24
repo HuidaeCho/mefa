@@ -1,9 +1,10 @@
 #include <stdlib.h>
 #include "global.h"
 
+#define INDEX(row, col) ((size_t)(row) * ncols + (col))
 #define DIR_NULL (unsigned char)dir_map->null_value
-#define DIR(row, col) dir_map->cells.byte[(size_t)(row) * ncols + (col)]
-#define ACCUM(row, col) accum_map->cells.uint32[(size_t)(row) * ncols + (col)]
+#define DIR(row, col) dir_map->cells.byte[INDEX(row, col)]
+#define ACCUM(row, col) accum_map->cells.uint32[INDEX(row, col)]
 #define FIND_UP(row, col) ( \
         (row > 0 ? \
          (col > 0 && DIR(row - 1, col - 1) == SE ? NW : 0) | \
@@ -21,7 +22,7 @@
 #define UP(row, col) FIND_UP(row, col)
 #else
 #define ACCUMULATE accumulate_moremem
-#define UP(row, col) up_cells[(size_t)(row) * ncols + (col)]
+#define UP(row, col) up_cells[INDEX(row, col)]
 static unsigned char *up_cells;
 #endif
 
