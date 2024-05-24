@@ -29,7 +29,7 @@ void print_raster(const char *path, const char *null_str, const char *fmt)
         break;
     }
 
-    width = (int)log10(rast_map->max) + 1;
+    width = rast_map->max > 0 ? (int)log10(rast_map->max) + 1 : 1;
 
     if (null_str) {
         int w = strlen(null_str);
