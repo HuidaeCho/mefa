@@ -4,7 +4,7 @@ Part of the [Memory-Efficient I/O-Improved Drainage Analysis System (MIDAS)](htt
 
 Please cite [Cho (2023)](https://doi.org/10.1016/j.envsoft.2023.105771) when you use this algorithm or the [r.flowaccumulation](https://grass.osgeo.org/grass-stable/manuals/addons/r.flowaccumulation.html) [GRASS](https://grass.osgeo.org/) addon.
 
-Citation: Huidae Cho, July 2023. Memory-Efficient Flow Accumulation Using a Look-Around Approach and Its OpenMP Parallelization. Environmental Modelling & Software 167, 105771. [doi:10.1016/j.envsoft.2023.105771](https://doi.org/10.1016/j.envsoft.2023.105771). [Author's Version](https://idea.isnew.info/publications/Memory-efficient%20flow%20accumulation%20using%20a%20look-around%20approach%20and%20its%20OpenMP%20parallelization.pdf).
+**Citation**: Huidae Cho, July 2023. Memory-Efficient Flow Accumulation Using a Look-Around Approach and Its OpenMP Parallelization. Environmental Modelling & Software 167, 105771. [doi:10.1016/j.envsoft.2023.105771](https://doi.org/10.1016/j.envsoft.2023.105771). [Author's Version](https://idea.isnew.info/publications/Memory-efficient%20flow%20accumulation%20using%20a%20look-around%20approach%20and%20its%20OpenMP%20parallelization.pdf).
 
 ![MEFA Graphical Abstract](https://idea.isnew.info/publications/Memory-efficient%20flow%20accumulation%20using%20a%20look-around%20approach%20and%20its%20OpenMP%20parallelization%20-%20Graphical%20abstract.png)
 
