@@ -13,7 +13,9 @@
 int main(int argc, char *argv[])
 {
     int i;
-    int print_usage = 1, use_lessmem = 0, compress_output = 0;
+    int print_usage = 1, use_lessmem = 0, compress_output =
+        0, custom_encoding = 0;
+    int encoding[8];
     char *dir_path = NULL, *accum_path = NULL;
     struct raster_map *dir_map, *accum_map;
     struct timeval start_time, end_time;
@@ -30,6 +32,40 @@ int main(int argc, char *argv[])
                     break;
                 case 'c':
                     compress_output = 1;
+                    break;
+                case 'e':
+                    if (i == argc - 1) {
+                        fprintf(stderr, "-%c: Missing encoding\n",
+                                argv[i][j]);
+                        print_usage = 2;
+                        break;
+                    }
+                    if (strcmp(argv[++i], "power2") == 0) {
+                        custom_encoding = 0;
+                        break;
+                    }
+                    else if (strcmp(argv[i], "taudem") == 0) {
+                        int k;
+
+                        for (k = 1; k < 9; k++)
+                            encoding[k % 8] = 9 - k;
+                    }
+                    else if (strcmp(argv[i], "45degree") == 0) {
+                        int k;
+
+                        for (k = 0; k < 8; k++)
+                            encoding[k] = 8 - k;
+                    }
+                    else if (sscanf
+                             (argv[i], "%d,%d,%d,%d,%d,%d,%d,%d",
+                              &encoding[0], &encoding[1], &encoding[2],
+                              &encoding[3], &encoding[4], &encoding[5],
+                              &encoding[6], &encoding[7]) != 8) {
+                        fprintf(stderr, "%s: Invalid encoding\n", argv[i]);
+                        print_usage = 2;
+                        break;
+                    }
+                    custom_encoding = 1;
                     break;
                 default:
                     unknown = 1;
@@ -59,10 +95,17 @@ int main(int argc, char *argv[])
     if (print_usage) {
         if (print_usage == 2)
             printf("\n");
-        printf("Usage: mefa [-lc] dir.tif accum.tif\n");
+        printf("Usage: mefa [-lc] [-e encoding] dir.tif accum.tif\n");
         printf("\n");
         printf("  -l\t\tUse less memory\n");
         printf("  -c\t\tCompress output GeoTIFF file\n");
+        printf("  -e encoding\tDirection encoding\n");
+        printf
+            ("\t\tpower2 (default): 2^0-7 CW from E (e.g., r.terraflow, ArcGIS)\n");
+        printf("\t\ttaudem: 1-8 (E-SE CCW) (e.g., d8flowdir)\n");
+        printf("\t\t45degree: 1-8 (NE-E CCW) (e.g., r.watershed)\n");
+        printf
+            ("\t\tE,SE,S,SW,W,NW,N,NE: custom (e.g., 1,8,7,6,5,4,3,2 for taudem)\n");
         printf("  dir.tif\tInput GeoTIFF file of flow direction raster\n");
         printf
             ("  accum.tif\tOutput GeoTIFF file for flow accumulation raster\n");
@@ -74,8 +117,14 @@ int main(int argc, char *argv[])
     printf("Reading flow direction raster <%s>...\n", dir_path);
     gettimeofday(&start_time, NULL);
     if (!(dir_map = read_raster(dir_path, RASTER_MAP_TYPE_BYTE, 0))) {
-        printf("%s: Failed to read flow direction raster\n", dir_path);
+        fprintf(stderr, "%s: Failed to read flow direction raster\n",
+                dir_path);
         exit(EXIT_FAILURE);
+    }
+    if (custom_encoding) {
+        printf("Converting flow direction encoding...\n");
+        if (convert_encoding(dir_map, encoding))
+            exit(EXIT_FAILURE);
     }
     gettimeofday(&end_time, NULL);
     printf("Input time for flow direction: %lld microsec\n",
@@ -97,7 +146,8 @@ int main(int argc, char *argv[])
     printf("Writing flow accumulation raster <%s>...\n", accum_path);
     gettimeofday(&start_time, NULL);
     if (write_raster(accum_path, accum_map, RASTER_MAP_TYPE_AUTO) > 0) {
-        printf("%s: Failed to write flow accumulation raster\n", accum_path);
+        fprintf(stderr, "%s: Failed to write flow accumulation raster\n",
+                accum_path);
         free_raster(accum_map);
         exit(EXIT_FAILURE);
     }
