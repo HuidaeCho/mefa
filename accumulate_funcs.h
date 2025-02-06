@@ -3,7 +3,7 @@
 #include "global.h"
 
 #define INDEX(row, col) ((size_t)(row) * ncols + (col))
-#define DIR_NULL (unsigned char)dir_map->null_value
+#define DIR_NULL dir_map->null_value
 #define DIR(row, col) dir_map->cells.byte[INDEX(row, col)]
 #define ACCUM(row, col) accum_map->cells.uint32[INDEX(row, col)]
 #define FIND_UP(row, col) ( \
