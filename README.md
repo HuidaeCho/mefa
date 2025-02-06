@@ -14,8 +14,12 @@ Please cite [Cho (2023)](https://doi.org/10.1016/j.envsoft.2023.105771) when you
 * Red: MEFA
 * Blue and purple: Benchmark algorithms
 
-Flow direction encoding in GeoTIFF:<br>
-![image](https://github.com/HuidaeCho/mefa/assets/7456117/6268b904-24a4-482e-8f6d-9ec9c4edf143)
+Predefined flow direction encodings in GeoTIFF: power2 (default, r.terraflow, ArcGIS), taudem (d8flowdir), 45degree (r.watershed)<br>
+![image](https://github.com/user-attachments/assets/990f0530-fded-4ee5-bfbb-85056a50ca1c)
+![image](https://github.com/user-attachments/assets/a02dfc15-a825-4210-82c4-4c9296dafadc)
+![image](https://github.com/user-attachments/assets/64f5c65a-c7cc-4e06-a69f-6fccd6435426)
+
+Custom flow direction encoding is also possible by passing `-e E,SE,S,SW,W,NW,N,NE` (e.g., 1,8,7,6,5,4,3,2 for taudem).
 
 ## Requirements
 
