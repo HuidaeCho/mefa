@@ -17,6 +17,7 @@ mefa$(EXT): \
 	main.o \
 	timeval_diff.o \
 	raster.o \
+	recode.o \
 	accumulate.o \
 	accumulate_lessmem.o \
 	accumulate_moremem.o

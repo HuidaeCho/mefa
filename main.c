@@ -13,9 +13,9 @@
 int main(int argc, char *argv[])
 {
     int i;
-    int print_usage = 1, use_lessmem = 0, compress_output =
-        0, custom_encoding = 0;
-    int encoding[8];
+    int print_usage = 1, use_lessmem = 0, compress_output = 0;
+    double (*recode)(double, void *) = NULL;
+    int *recode_data = NULL, encoding[8];
     char *dir_path = NULL, *accum_path = NULL;
     struct raster_map *dir_map, *accum_map;
     struct timeval start_time, end_time;
@@ -41,7 +41,8 @@ int main(int argc, char *argv[])
                         break;
                     }
                     if (strcmp(argv[++i], "power2") == 0) {
-                        custom_encoding = 0;
+                        recode = NULL;
+                        recode_data = NULL;
                         break;
                     }
                     else if (strcmp(argv[i], "taudem") == 0) {
@@ -56,6 +57,11 @@ int main(int argc, char *argv[])
                         for (k = 0; k < 8; k++)
                             encoding[k] = 8 - k;
                     }
+                    else if (strcmp(argv[i], "degree") == 0) {
+                        recode = recode_degree;
+                        recode_data = NULL;
+                        break;
+                    }
                     else if (sscanf
                              (argv[i], "%d,%d,%d,%d,%d,%d,%d,%d",
                               &encoding[0], &encoding[1], &encoding[2],
@@ -65,7 +71,8 @@ int main(int argc, char *argv[])
                         print_usage = 2;
                         break;
                     }
-                    custom_encoding = 1;
+                    recode = recode_encoding;
+                    recode_data = encoding;
                     break;
                 default:
                     unknown = 1;
@@ -104,6 +111,7 @@ int main(int argc, char *argv[])
             ("\t\tpower2 (default): 2^0-7 CW from E (e.g., r.terraflow, ArcGIS)\n");
         printf("\t\ttaudem: 1-8 (E-SE CCW) (e.g., d8flowdir)\n");
         printf("\t\t45degree: 1-8 (NE-E CCW) (e.g., r.watershed)\n");
+        printf("\t\tdegree: (0,360] (E-E CCW)\n");
         printf
             ("\t\tE,SE,S,SW,W,NW,N,NE: custom (e.g., 1,8,7,6,5,4,3,2 for taudem)\n");
         printf("  dir.tif\tInput GeoTIFF file of flow direction raster\n");
@@ -116,15 +124,21 @@ int main(int argc, char *argv[])
 
     printf("Reading flow direction raster <%s>...\n", dir_path);
     gettimeofday(&start_time, NULL);
-    if (!(dir_map = read_raster(dir_path, RASTER_MAP_TYPE_BYTE, 0))) {
+    if (recode) {
+        printf("Converting flow direction encoding...\n");
+        if (!(dir_map = read_raster(dir_path, RASTER_MAP_TYPE_BYTE, 0, recode,
+                                    recode_data))) {
+            fprintf(stderr, "%s: Failed to read flow direction raster\n",
+                    dir_path);
+            exit(EXIT_FAILURE);
+        }
+    }
+    else if (!
+             (dir_map =
+              read_raster(dir_path, RASTER_MAP_TYPE_BYTE, 0, NULL, NULL))) {
         fprintf(stderr, "%s: Failed to read flow direction raster\n",
                 dir_path);
         exit(EXIT_FAILURE);
-    }
-    if (custom_encoding) {
-        printf("Converting flow direction encoding...\n");
-        if (convert_encoding(dir_map, encoding))
-            exit(EXIT_FAILURE);
     }
     gettimeofday(&end_time, NULL);
     printf("Input time for flow direction: %lld microsec\n",
