@@ -22,6 +22,7 @@ void print_raster(const char *path, const char *null_str, const char *fmt)
         type_format = "f";
         break;
     case RASTER_MAP_TYPE_UINT32:
+    case RASTER_MAP_TYPE_UINT16:
         type_format = "u";
         break;
     default:
@@ -122,6 +123,12 @@ void print_raster(const char *path, const char *null_str, const char *fmt)
                 case RASTER_MAP_TYPE_INT32:
                     printf(format, rast_map->cells.int32[idx], sep);
                     break;
+                case RASTER_MAP_TYPE_UINT16:
+                    printf(format, rast_map->cells.uint16[idx], sep);
+                    break;
+                case RASTER_MAP_TYPE_INT16:
+                    printf(format, rast_map->cells.int16[idx], sep);
+                    break;
                 default:
                     printf(format, rast_map->cells.byte[idx], sep);
                     break;
@@ -154,6 +161,12 @@ int is_null(struct raster_map *rast_map, int row, int col)
     case RASTER_MAP_TYPE_INT32:
         ret = rast_map->cells.int32[idx] == rast_map->null_value;
         break;
+    case RASTER_MAP_TYPE_UINT16:
+        ret = rast_map->cells.uint16[idx] == rast_map->null_value;
+        break;
+    case RASTER_MAP_TYPE_INT16:
+        ret = rast_map->cells.int16[idx] == rast_map->null_value;
+        break;
     default:
         ret = rast_map->cells.byte[idx] == rast_map->null_value;
         break;
@@ -177,6 +190,12 @@ void set_null(struct raster_map *rast_map, int row, int col)
         break;
     case RASTER_MAP_TYPE_INT32:
         rast_map->cells.int32[idx] = rast_map->null_value;
+        break;
+    case RASTER_MAP_TYPE_UINT16:
+        rast_map->cells.uint16[idx] = rast_map->null_value;
+        break;
+    case RASTER_MAP_TYPE_INT16:
+        rast_map->cells.int16[idx] = rast_map->null_value;
         break;
     default:
         rast_map->cells.byte[idx] = rast_map->null_value;
@@ -212,6 +231,14 @@ void reset_null(struct raster_map *rast_map, double null_value)
                 if (rast_map->cells.int32[idx] == rast_map->null_value)
                     rast_map->cells.int32[idx] = null_value;
                 break;
+            case RASTER_MAP_TYPE_UINT16:
+                if (rast_map->cells.uint16[idx] == rast_map->null_value)
+                    rast_map->cells.uint16[idx] = null_value;
+                break;
+            case RASTER_MAP_TYPE_INT16:
+                if (rast_map->cells.int16[idx] == rast_map->null_value)
+                    rast_map->cells.int16[idx] = null_value;
+                break;
             default:
                 if (rast_map->cells.byte[idx] == rast_map->null_value)
                     rast_map->cells.byte[idx] = null_value;
@@ -245,6 +272,12 @@ struct raster_map *init_raster(int nrows, int ncols, int type)
         break;
     case RASTER_MAP_TYPE_INT32:
         row_size *= sizeof(int);
+        break;
+    case RASTER_MAP_TYPE_UINT16:
+        row_size *= sizeof(unsigned short);
+        break;
+    case RASTER_MAP_TYPE_INT16:
+        row_size *= sizeof(short);
         break;
     }
 
@@ -346,6 +379,12 @@ struct raster_map *read_raster(const char *path, int type, int get_stats,
         case RASTER_MAP_TYPE_INT32:
             rast_type = GDT_Int32;
             break;
+        case RASTER_MAP_TYPE_UINT16:
+            rast_type = GDT_UInt16;
+            break;
+        case RASTER_MAP_TYPE_INT16:
+            rast_type = GDT_Int16;
+            break;
         case RASTER_MAP_TYPE_BYTE:
             rast_type = GDT_Byte;
             break;
@@ -362,6 +401,12 @@ struct raster_map *read_raster(const char *path, int type, int get_stats,
                 break;
             case GDT_Int32:
                 rast_type = RASTER_MAP_TYPE_INT32;
+                break;
+            case GDT_UInt16:
+                rast_type = RASTER_MAP_TYPE_UINT16;
+                break;
+            case GDT_Int16:
+                rast_type = RASTER_MAP_TYPE_INT16;
                 break;
             case GDT_Byte:
                 rast_type = RASTER_MAP_TYPE_BYTE;
@@ -405,6 +450,12 @@ struct raster_map *read_raster(const char *path, int type, int get_stats,
                         case GDT_Int32:
                             v = rast_map->cells.int32[i];
                             break;
+                        case GDT_UInt16:
+                            v = rast_map->cells.uint16[i];
+                            break;
+                        case GDT_Int16:
+                            v = rast_map->cells.int16[i];
+                            break;
                         default:
                             v = rast_map->cells.byte[i];
                             break;
@@ -429,6 +480,13 @@ struct raster_map *read_raster(const char *path, int type, int get_stats,
                         case GDT_Int32:
                             rast_map->cells.int32[i] = recode(v, recode_data);
                             break;
+                        case GDT_UInt16:
+                            rast_map->cells.uint16[i] =
+                                recode(v, recode_data);
+                            break;
+                        case GDT_Int16:
+                            rast_map->cells.int16[i] = recode(v, recode_data);
+                            break;
                         default:
                             rast_map->cells.byte[i] = recode(v, recode_data);
                             break;
@@ -444,6 +502,8 @@ struct raster_map *read_raster(const char *path, int type, int get_stats,
             {
                 void *v;
                 unsigned char *byte;
+                short *int16;
+                unsigned short *uint16;
                 int *int32;
                 unsigned int *uint32;
                 float *float32;
@@ -463,6 +523,10 @@ struct raster_map *read_raster(const char *path, int type, int get_stats,
                 rast_map->null_value = UINT_MAX;
             else if (rast_type == GDT_Int32)
                 rast_map->null_value = INT_MAX;
+            else if (rast_type == GDT_UInt16)
+                rast_map->null_value = USHRT_MAX;
+            else if (rast_type == GDT_Int16)
+                rast_map->null_value = SHRT_MAX;
             else
                 rast_map->null_value = UCHAR_MAX;
 
@@ -493,6 +557,12 @@ struct raster_map *read_raster(const char *path, int type, int get_stats,
                         case GDT_Int32:
                             v = cells[thread_num].int32[col];
                             break;
+                        case GDT_UInt16:
+                            v = cells[thread_num].uint16[col];
+                            break;
+                        case GDT_Int16:
+                            v = cells[thread_num].int16[col];
+                            break;
                         default:
                             v = cells[thread_num].byte[col];
                             break;
@@ -514,6 +584,14 @@ struct raster_map *read_raster(const char *path, int type, int get_stats,
                                 break;
                             case GDT_Int32:
                                 rast_map->cells.int32[i] =
+                                    rast_map->null_value;
+                                break;
+                            case GDT_UInt16:
+                                rast_map->cells.uint16[i] =
+                                    rast_map->null_value;
+                                break;
+                            case GDT_Int16:
+                                rast_map->cells.int16[i] =
                                     rast_map->null_value;
                                 break;
                             default:
@@ -539,6 +617,13 @@ struct raster_map *read_raster(const char *path, int type, int get_stats,
                             break;
                         case GDT_Int32:
                             rast_map->cells.int32[i] = recode(v, recode_data);
+                            break;
+                        case GDT_UInt16:
+                            rast_map->cells.uint16[i] =
+                                recode(v, recode_data);
+                            break;
+                        case GDT_Int16:
+                            rast_map->cells.int16[i] = recode(v, recode_data);
                             break;
                         default:
                             rast_map->cells.byte[i] = recode(v, recode_data);
@@ -569,6 +654,12 @@ struct raster_map *read_raster(const char *path, int type, int get_stats,
         case RASTER_MAP_TYPE_INT32:
             gdt_type = GDT_Int32;
             break;
+        case RASTER_MAP_TYPE_UINT16:
+            gdt_type = GDT_UInt16;
+            break;
+        case RASTER_MAP_TYPE_INT16:
+            gdt_type = GDT_Int16;
+            break;
         case RASTER_MAP_TYPE_BYTE:
             gdt_type = GDT_Byte;
             break;
@@ -585,6 +676,12 @@ struct raster_map *read_raster(const char *path, int type, int get_stats,
                 break;
             case GDT_Int32:
                 type = RASTER_MAP_TYPE_INT32;
+                break;
+            case GDT_UInt16:
+                type = RASTER_MAP_TYPE_UINT16;
+                break;
+            case GDT_Int16:
+                type = RASTER_MAP_TYPE_INT16;
                 break;
             case GDT_Byte:
                 type = RASTER_MAP_TYPE_BYTE;
@@ -660,6 +757,12 @@ int write_raster(const char *path, struct raster_map *rast_map, int type)
     case RASTER_MAP_TYPE_INT32:
         data_type = GDT_Int32;
         break;
+    case RASTER_MAP_TYPE_UINT16:
+        data_type = GDT_UInt16;
+        break;
+    case RASTER_MAP_TYPE_INT16:
+        data_type = GDT_Int16;
+        break;
     default:
         data_type = GDT_Byte;
         break;
@@ -681,6 +784,12 @@ int write_raster(const char *path, struct raster_map *rast_map, int type)
             break;
         case RASTER_MAP_TYPE_INT32:
             gdt_type = GDT_Int32;
+            break;
+        case RASTER_MAP_TYPE_UINT16:
+            gdt_type = GDT_UInt16;
+            break;
+        case RASTER_MAP_TYPE_INT16:
+            gdt_type = GDT_Int16;
             break;
         default:
             gdt_type = GDT_Byte;

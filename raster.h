@@ -3,10 +3,12 @@
 
 #define RASTER_MAP_TYPE_AUTO 0
 #define RASTER_MAP_TYPE_BYTE 1
-#define RASTER_MAP_TYPE_INT32 2
-#define RASTER_MAP_TYPE_UINT32 3
-#define RASTER_MAP_TYPE_FLOAT32 4
-#define RASTER_MAP_TYPE_FLOAT64 5
+#define RASTER_MAP_TYPE_INT16 2
+#define RASTER_MAP_TYPE_UINT16 3
+#define RASTER_MAP_TYPE_INT32 4
+#define RASTER_MAP_TYPE_UINT32 5
+#define RASTER_MAP_TYPE_FLOAT32 6
+#define RASTER_MAP_TYPE_FLOAT64 7
 
 struct raster_map
 {
@@ -16,6 +18,8 @@ struct raster_map
     {
         void *v;
         unsigned char *byte;
+        short *int16;
+        unsigned short *uint16;
         int *int32;
         unsigned int *uint32;
         float *float32;

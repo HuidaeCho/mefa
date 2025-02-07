@@ -1,6 +1,5 @@
 #include <math.h>
 #include "global.h"
-#include <stdio.h>
 
 double recode_encoding(double value, void *data)
 {
