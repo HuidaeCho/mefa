@@ -330,8 +330,10 @@ struct raster_map *read_raster(const char *path, int type, int get_stats,
         datasets[omp_get_thread_num()] = GDALOpen(path, GA_ReadOnly);
     }
 
-    if (!(dataset = datasets[0]))
+    if (!(dataset = datasets[0])) {
+        free(datasets);
         return NULL;
+    }
 
     rast_map = calloc(1, sizeof *rast_map);
     rast_map->nrows = GDALGetRasterYSize(dataset);
@@ -739,7 +741,7 @@ int write_raster(const char *path, struct raster_map *rast_map, int type)
         return 2;
 
     if (rast_map->compress)
-        options = CSLSetNameValue(options, "COMPRESS", "LZW");
+        options = CSLSetNameValue(options, "COMPRESS", "ZSTD");
 
     row_size = rast_map->ncols;
 
@@ -808,13 +810,11 @@ int write_raster(const char *path, struct raster_map *rast_map, int type)
     band = GDALGetRasterBand(dataset, 1);
     GDALSetRasterNoDataValue(band, rast_map->null_value);
 
-    for (row = 0; row < rast_map->nrows; row++) {
-        if (GDALRasterIO
-            (band, GF_Write, 0, row, rast_map->ncols, 1,
-             (char *)rast_map->cells.v + row * row_size, rast_map->ncols,
-             1, data_type, 0, 0) != CE_None)
-            return 4;
-    }
+    if (GDALRasterIO
+        (band, GF_Write, 0, 0, rast_map->ncols, rast_map->nrows,
+         (char *)rast_map->cells.v, rast_map->ncols, rast_map->nrows,
+         data_type, 0, 0) != CE_None)
+        return 4;
 
     GDALClose(dataset);
 
