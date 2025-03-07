@@ -18,7 +18,7 @@ Predefined flow direction encodings in GeoTIFF: power2 (default, r.terraflow, Ar
 ![image](https://github.com/user-attachments/assets/990f0530-fded-4ee5-bfbb-85056a50ca1c)
 ![image](https://github.com/user-attachments/assets/a02dfc15-a825-4210-82c4-4c9296dafadc)
 ![image](https://github.com/user-attachments/assets/64f5c65a-c7cc-4e06-a69f-6fccd6435426)
-![image](https://github.com/user-attachments/assets/5a43db59-2f32-4a1f-a6df-c14645153953)
+![image](https://github.com/user-attachments/assets/fafef436-a5f2-464a-89a8-9f50a877932c)
 
 Custom flow direction encoding is also possible by passing `-e E,SE,S,SW,W,NW,N,NE` (e.g., 1,8,7,6,5,4,3,2 for taudem).
 
