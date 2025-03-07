@@ -731,7 +731,6 @@ int write_raster(const char *path, struct raster_map *rast_map, int type)
     GDALRasterBandH band;
     GDALDataType data_type, gdt_type;
     size_t row_size;
-    int row;
 
     if (!driver)
         return 1;
