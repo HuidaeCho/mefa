@@ -38,14 +38,14 @@ struct raster_map
 };
 
 /* raster.c */
-void print_raster(const char *, const char *, const char *);
+void print_raster(const char *, const char *, const char *, const char *);
 int is_null(struct raster_map *, int, int);
 void set_null(struct raster_map *, int, int);
 void reset_null(struct raster_map *, double);
 struct raster_map *init_raster(int, int, int);
 void free_raster(struct raster_map *);
 void copy_raster_metadata(struct raster_map *, const struct raster_map *);
-struct raster_map *read_raster(const char *, int, int,
+struct raster_map *read_raster(const char *, const char *, int, int,
                                double (*)(double, void *), void *);
 int write_raster(const char *, struct raster_map *, int);
 void calc_row_col(struct raster_map *, double, double, int *, int *);

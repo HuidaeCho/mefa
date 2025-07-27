@@ -24,4 +24,4 @@ mefa$(EXT): \
 	$(CC) $(LDFLAGS) -o $@ $^ $(GDAL_LIBS)
 
 *.o: global.h raster.h
-accumulate_*.o: accumulate_funcs.h
+accumulate*.o: accumulate_funcs.h

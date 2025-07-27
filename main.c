@@ -16,9 +16,11 @@ int main(int argc, char *argv[])
     int print_usage = 1, use_lessmem = 0, compress_output = 0;
     double (*recode)(double, void *) = NULL;
     int *recode_data = NULL, encoding[8];
-    char *dir_path = NULL, *accum_path = NULL;
+    char *dir_path = NULL, *dir_opts = NULL, *accum_path = NULL;
     struct raster_map *dir_map, *accum_map;
-    struct timeval start_time, end_time;
+    struct timeval first_time, start_time, end_time;
+
+    gettimeofday(&first_time, NULL);
 
     for (i = 1; i < argc; i++) {
         if (argv[i][0] == '-') {
@@ -27,7 +29,7 @@ int main(int argc, char *argv[])
 
             for (j = 1; j < n && !unknown; j++) {
                 switch (argv[i][j]) {
-                case 'l':
+                case 'm':
                     use_lessmem = 1;
                     break;
                 case 'c':
@@ -74,13 +76,23 @@ int main(int argc, char *argv[])
                     recode = recode_encoding;
                     recode_data = encoding;
                     break;
+                case 'D':
+                    if (i == argc - 1) {
+                        fprintf(stderr,
+                                "-%c: Missing GDAL options for input direction\n",
+                                argv[i][j]);
+                        print_usage = 2;
+                        break;
+                    }
+                    dir_opts = argv[++i];
+                    break;
                 default:
                     unknown = 1;
                     break;
                 }
             }
             if (unknown) {
-                fprintf(stderr, "%c: Unknown flag\n", argv[i][j]);
+                fprintf(stderr, "%c: Unknown flag\n", argv[i][--j]);
                 print_usage = 2;
                 break;
             }
@@ -102,11 +114,14 @@ int main(int argc, char *argv[])
     if (print_usage) {
         if (print_usage == 2)
             printf("\n");
-        printf("Usage: mefa [-lc] [-e encoding] dir.tif accum.tif\n");
+        printf("Usage: mefa OPTIONS dir accum\n");
         printf("\n");
-        printf("  -l\t\tUse less memory\n");
-        printf("  -c\t\tCompress output GeoTIFF file\n");
-        printf("  -e encoding\tDirection encoding\n");
+        printf
+            ("  dir\t\tInput flow direction raster (e.g., gpkg:file.gpkg:layer)\n");
+        printf("  accum\tOutput GeoTIFF\n");
+        printf("  -m\t\tUse less memory\n");
+        printf("  -c\t\tCompress output GeoTIFF\n");
+        printf("  -e encoding\tInput flow direction encoding\n");
         printf
             ("\t\tpower2 (default): 2^0-7 CW from E (e.g., r.terraflow, ArcGIS)\n");
         printf("\t\ttaudem: 1-8 (E-SE CCW) (e.g., d8flowdir)\n");
@@ -114,9 +129,7 @@ int main(int argc, char *argv[])
         printf("\t\tdegree: (0,360] (E-E CCW)\n");
         printf
             ("\t\tE,SE,S,SW,W,NW,N,NE: custom (e.g., 1,8,7,6,5,4,3,2 for taudem)\n");
-        printf("  dir.tif\tInput GeoTIFF file of flow direction raster\n");
-        printf
-            ("  accum.tif\tOutput GeoTIFF file for flow accumulation raster\n");
+        printf("  -D opts\tComma-separated list of GDAL options for dir\n");
         exit(EXIT_SUCCESS);
     }
 
@@ -126,16 +139,17 @@ int main(int argc, char *argv[])
     gettimeofday(&start_time, NULL);
     if (recode) {
         printf("Converting flow direction encoding...\n");
-        if (!(dir_map = read_raster(dir_path, RASTER_MAP_TYPE_BYTE, 0, recode,
-                                    recode_data))) {
+        if (!(dir_map =
+              read_raster(dir_path, dir_opts, RASTER_MAP_TYPE_BYTE, 0, recode,
+                          recode_data))) {
             fprintf(stderr, "%s: Failed to read flow direction raster\n",
                     dir_path);
             exit(EXIT_FAILURE);
         }
     }
-    else if (!
-             (dir_map =
-              read_raster(dir_path, RASTER_MAP_TYPE_BYTE, 0, NULL, NULL))) {
+    else if (!(dir_map =
+               read_raster(dir_path, dir_opts, RASTER_MAP_TYPE_BYTE, 0, NULL,
+                           NULL))) {
         fprintf(stderr, "%s: Failed to read flow direction raster\n",
                 dir_path);
         exit(EXIT_FAILURE);
@@ -168,7 +182,12 @@ int main(int argc, char *argv[])
     gettimeofday(&end_time, NULL);
     printf("Output time for flow accumulation: %lld microsec\n",
            timeval_diff(NULL, &end_time, &start_time));
+
     free_raster(accum_map);
+
+    gettimeofday(&end_time, NULL);
+    printf("Total elapsed time: %lld microsec\n",
+           timeval_diff(NULL, &end_time, &first_time));
 
     exit(EXIT_SUCCESS);
 }
