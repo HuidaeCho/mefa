@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <gdal.h>
+#include <omp.h>
 #ifdef _MSC_VER
 #include <winsock2.h>
 #else
@@ -17,6 +18,7 @@ int main(int argc, char *argv[])
     double (*recode)(double, void *) = NULL;
     int *recode_data = NULL, encoding[8];
     char *dir_path = NULL, *dir_opts = NULL, *accum_path = NULL;
+    int num_threads = 0;
     struct raster_map *dir_map, *accum_map;
     struct timeval first_time, start_time, end_time;
 
@@ -86,6 +88,15 @@ int main(int argc, char *argv[])
                     }
                     dir_opts = argv[++i];
                     break;
+                case 't':
+                    if (i == argc - 1) {
+                        fprintf(stderr, "-%c: Missing number of threads\n",
+                                argv[i][j]);
+                        print_usage = 2;
+                        break;
+                    }
+                    num_threads = atoi(argv[++i]);
+                    break;
                 default:
                     unknown = 1;
                     break;
@@ -130,8 +141,22 @@ int main(int argc, char *argv[])
         printf
             ("\t\tE,SE,S,SW,W,NW,N,NE: custom (e.g., 1,8,7,6,5,4,3,2 for taudem)\n");
         printf("  -D opts\tComma-separated list of GDAL options for dir\n");
+        printf("  -t threads\tNumber of threads (default OMP_NUM_THREADS)\n");
         exit(EXIT_SUCCESS);
     }
+
+    if (num_threads == 0)
+        num_threads = omp_get_max_threads();
+    else {
+        if (num_threads < 0) {
+            num_threads += omp_get_num_procs();
+            if (num_threads < 1)
+                num_threads = 1;
+        }
+        omp_set_num_threads(num_threads);
+    }
+
+    printf("Using %d threads...\n", num_threads);
 
     GDALAllRegister();
 
