@@ -118,7 +118,7 @@ int main(int argc, char *argv[])
         printf("\n");
         printf
             ("  dir\t\tInput flow direction raster (e.g., gpkg:file.gpkg:layer)\n");
-        printf("  accum\tOutput GeoTIFF\n");
+        printf("  accum\t\tOutput GeoTIFF\n");
         printf("  -m\t\tUse less memory\n");
         printf("  -c\t\tCompress output GeoTIFF\n");
         printf("  -e encoding\tInput flow direction encoding\n");
