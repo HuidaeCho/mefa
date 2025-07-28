@@ -68,11 +68,11 @@ static void trace_down(struct raster_map *dir_map,
                        struct raster_map *accum_map, int row, int col,
                        int accum)
 {
-    int accum_up = 0;
-
 #ifdef DONT_USE_TCO
     do {
 #endif
+        int accum_up = 0;
+
         /* accumulate the current cell itself */
         ACCUM(row, col) = accum;
 
@@ -116,7 +116,7 @@ static void trace_down(struct raster_map *dir_map,
             return;
 
 #ifdef DONT_USE_TCO
-        accum_up++;
+        accum = accum_up + 1;
     } while (1);
     /* XXX: work around an indent bug
      * #else
