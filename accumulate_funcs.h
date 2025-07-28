@@ -70,51 +70,63 @@ static void trace_down(struct raster_map *dir_map,
 {
     int accum_up = 0;
 
-    /* accumulate the current cell itself */
-    ACCUM(row, col) = accum;
+#ifdef DONT_USE_TCO
+    do {
+#endif
+        /* accumulate the current cell itself */
+        ACCUM(row, col) = accum;
 
-    /* find the downstream cell */
-    switch (DIR(row, col)) {
-    case NW:
-        row--;
-        col--;
-        break;
-    case N:
-        row--;
-        break;
-    case NE:
-        row--;
-        col++;
-        break;
-    case W:
-        col--;
-        break;
-    case E:
-        col++;
-        break;
-    case SW:
-        row++;
-        col--;
-        break;
-    case S:
-        row++;
-        break;
-    case SE:
-        row++;
-        col++;
-        break;
-    }
+        /* find the downstream cell */
+        switch (DIR(row, col)) {
+        case NW:
+            row--;
+            col--;
+            break;
+        case N:
+            row--;
+            break;
+        case NE:
+            row--;
+            col++;
+            break;
+        case W:
+            col--;
+            break;
+        case E:
+            col++;
+            break;
+        case SW:
+            row++;
+            col--;
+            break;
+        case S:
+            row++;
+            break;
+        case SE:
+            row++;
+            col++;
+            break;
+        }
 
-    /* if the downstream cell is null or any upstream cells of the downstream
-     * cell have never been visited, stop tracing down */
-    if (row < 0 || row >= nrows || col < 0 || col >= ncols ||
-        DIR(row, col) == DIR_NULL ||
-        !(accum_up = sum_up(dir_map, accum_map, row, col)))
-        return;
+	/* if the downstream cell is null or any upstream cells of the
+	 * downstream cell have never been visited, stop tracing down */
+        if (row < 0 || row >= nrows || col < 0 || col >= ncols ||
+            DIR(row, col) == DIR_NULL ||
+            !(accum_up = sum_up(dir_map, accum_map, row, col)))
+            return;
 
+#ifdef DONT_USE_TCO
+        accum_up++;
+    } while (1);
+    /* XXX: work around an indent bug
+     * #else
+     * doesn't work */
+#endif
+#ifndef DONT_USE_TCO
     /* use gcc -O2 or -O3 flags for tail-call optimization
      * (-foptimize-sibling-calls) */
     trace_down(dir_map, accum_map, row, col, accum_up + 1);
+#endif
 }
 
 /* if any upstream cells have never been visited, 0 is returned; otherwise, the
