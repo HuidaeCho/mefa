@@ -108,8 +108,8 @@ static void trace_down(struct raster_map *dir_map,
             break;
         }
 
-	/* if the downstream cell is null or any upstream cells of the
-	 * downstream cell have never been visited, stop tracing down */
+        /* if the downstream cell is null or any upstream cells of the
+         * downstream cell have never been visited, stop tracing down */
         if (row < 0 || row >= nrows || col < 0 || col >= ncols ||
             DIR(row, col) == DIR_NULL ||
             !(accum_up = sum_up(dir_map, accum_map, row, col)))
