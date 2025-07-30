@@ -5,11 +5,6 @@
 #include <string.h>
 #include <omp.h>
 #include <gdal.h>
-#ifdef _MSC_VER
-#include <winsock2.h>
-#else
-#include <sys/time.h>
-#endif
 #include "global.h"
 
 int main(int argc, char *argv[])
