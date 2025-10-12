@@ -11,11 +11,13 @@ int main(int argc, char *argv[])
 {
     int i;
     int print_usage = 1, use_lessmem = 0, compress_output = 0;
+    int accum_type = RASTER_MAP_TYPE_UINT32;
     double (*recode)(double, void *) = NULL;
     int *recode_data = NULL, encoding[8];
-    char *dir_path = NULL, *dir_opts = NULL, *accum_path = NULL;
+    char *dir_path = NULL, *dir_opts = NULL,
+        *weight_path = NULL, *weight_opts = NULL, *accum_path = NULL;
     int num_threads = 0;
-    struct raster_map *dir_map, *accum_map;
+    struct raster_map *dir_map, *weight_map, *accum_map;
     struct timeval first_time, start_time, end_time;
 
     gettimeofday(&first_time, NULL);
@@ -27,6 +29,34 @@ int main(int argc, char *argv[])
 
             for (j = 1; j < n && !unknown; j++) {
                 switch (argv[i][j]) {
+                case 'a':
+                    if (i == argc - 1) {
+                        fprintf(stderr, "-%c: Missing accumulation type\n",
+                                argv[i][j]);
+                        print_usage = 2;
+                        break;
+                    }
+                    if (strcmp(argv[++i], "byte") == 0)
+                        accum_type = RASTER_MAP_TYPE_BYTE;
+                    else if (strcmp(argv[i], "int16") == 0)
+                        accum_type = RASTER_MAP_TYPE_INT16;
+                    else if (strcmp(argv[i], "uint16") == 0)
+                        accum_type = RASTER_MAP_TYPE_UINT16;
+                    else if (strcmp(argv[i], "int32") == 0)
+                        accum_type = RASTER_MAP_TYPE_INT32;
+                    else if (strcmp(argv[i], "uint32") == 0)
+                        accum_type = RASTER_MAP_TYPE_UINT32;
+                    else if (strcmp(argv[i], "float32") == 0)
+                        accum_type = RASTER_MAP_TYPE_FLOAT32;
+                    else if (strcmp(argv[i], "float64") == 0)
+                        accum_type = RASTER_MAP_TYPE_FLOAT64;
+                    else {
+                        fprintf(stderr, "%s: Invalid accumulation type\n",
+                                argv[i]);
+                        print_usage = 2;
+                        break;
+                    }
+                    break;
                 case 'm':
                     use_lessmem = 1;
                     break;
@@ -74,6 +104,15 @@ int main(int argc, char *argv[])
                     recode = recode_encoding;
                     recode_data = encoding;
                     break;
+                case 'w':
+                    if (i == argc - 1) {
+                        fprintf(stderr,
+                                "-%c: Missing input weight\n", argv[i][j]);
+                        print_usage = 2;
+                        break;
+                    }
+                    weight_path = argv[++i];
+                    break;
                 case 'D':
                     if (i == argc - 1) {
                         fprintf(stderr,
@@ -83,6 +122,16 @@ int main(int argc, char *argv[])
                         break;
                     }
                     dir_opts = argv[++i];
+                    break;
+                case 'W':
+                    if (i == argc - 1) {
+                        fprintf(stderr,
+                                "-%c: Missing GDAL options for input weight\n",
+                                argv[i][j]);
+                        print_usage = 2;
+                        break;
+                    }
+                    weight_opts = argv[++i];
                     break;
                 case 't':
                     if (i == argc - 1) {
@@ -125,7 +174,10 @@ int main(int argc, char *argv[])
         printf("\n");
         printf
             ("  dir\t\tInput flow direction raster (e.g., gpkg:file.gpkg:layer)\n");
-        printf("  accum\t\tOutput GeoTIFF\n");
+        printf("  accum\t\tOutput flow accumulation GeoTIFF\n");
+        printf
+            ("  -a type\tFlow accumulation data type (default: uint32 or weight)\n");
+        printf("\t\tbyte, int16, uint16, int32, uint32, float32, float64\n");
         printf("  -m\t\tUse less memory\n");
         printf("  -c\t\tCompress output GeoTIFF\n");
         printf("  -e encoding\tInput flow direction encoding\n");
@@ -136,7 +188,10 @@ int main(int argc, char *argv[])
         printf("\t\tdegree: (0,360] (E-E CCW)\n");
         printf
             ("\t\tE,SE,S,SW,W,NW,N,NE: custom (e.g., 1,8,7,6,5,4,3,2 for taudem)\n");
+        printf("  -w weight\tInput weight raster\n");
         printf("  -D opts\tComma-separated list of GDAL options for dir\n");
+        printf
+            ("  -W opts\tComma-separated list of GDAL options for weight\n");
         printf("  -t threads\tNumber of threads (default OMP_NUM_THREADS)\n");
         exit(EXIT_SUCCESS);
     }
@@ -179,17 +234,41 @@ int main(int argc, char *argv[])
     printf("Input time for flow direction: %lld microsec\n",
            timeval_diff(NULL, &end_time, &start_time));
 
-    accum_map =
-        init_raster(dir_map->nrows, dir_map->ncols, RASTER_MAP_TYPE_UINT32);
+    if (weight_path) {
+        printf("Reading weight raster <%s>...\n", weight_path);
+        gettimeofday(&start_time, NULL);
+        if (!(weight_map =
+              read_raster(weight_path, weight_opts, RASTER_MAP_TYPE_AUTO, 0,
+                          NULL, NULL))) {
+            fprintf(stderr, "%s: Failed to read weight raster\n",
+                    weight_path);
+            exit(EXIT_FAILURE);
+        }
+        gettimeofday(&end_time, NULL);
+        printf("Input time for weight: %lld microsec\n",
+               timeval_diff(NULL, &end_time, &start_time));
+    }
+    else
+        weight_map = NULL;
+
+    if (weight_map && accum_type != RASTER_MAP_TYPE_FLOAT64 &&
+        accum_type < weight_map->type) {
+        accum_type = weight_map->type;
+        printf("Flow accumulation data type promoted to the weight type\n");
+    }
+
+    accum_map = init_raster(dir_map->nrows, dir_map->ncols, accum_type);
     copy_raster_metadata(accum_map, dir_map);
 
     printf("Accumulating flows...\n");
     gettimeofday(&start_time, NULL);
-    accumulate(dir_map, accum_map, use_lessmem);
+    accumulate(dir_map, weight_map, accum_map, use_lessmem);
     gettimeofday(&end_time, NULL);
     printf("Computation time for flow accumulation: %lld microsec\n",
            timeval_diff(NULL, &end_time, &start_time));
     free_raster(dir_map);
+    if (weight_map)
+        free_raster(weight_map);
 
     accum_map->compress = compress_output;
     printf("Writing flow accumulation raster <%s>...\n", accum_path);
