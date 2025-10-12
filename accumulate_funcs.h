@@ -54,22 +54,22 @@
                         : weight_map->cells.float64[INDEX(row, col)])))))))
 #define IS_WEIGHT_NULL(row, col) is_null(weight_map, row, col)
 #define FIND_UP(row, col) ( \
-	(row > 0 ? \
-	 (col > 0 && DIR(row - 1, col - 1) == SE && \
-	  !IS_WEIGHT_NULL(row - 1, col - 1) ? NW : 0) | \
-	 (DIR(row - 1, col) == S && !IS_WEIGHT_NULL(row - 1, col) ? N : 0) | \
-	 (col < ncols - 1 && DIR(row - 1, col + 1) == SW && \
-	  !IS_WEIGHT_NULL(row - 1, col + 1) ? NE : 0) : 0) | \
-	(col > 0 && DIR(row, col - 1) == E && \
-	 !IS_WEIGHT_NULL(row, col - 1) ? W : 0) | \
-	(col < ncols - 1 && DIR(row, col + 1) == W && \
-	 !IS_WEIGHT_NULL(row, col + 1) ? E : 0) | \
-	(row < nrows - 1 ? \
-	 (col > 0 && DIR(row + 1, col - 1) == NE && \
-	  !IS_WEIGHT_NULL(row + 1, col - 1) ? SW : 0) | \
-	 (DIR(row + 1, col) == N && !IS_WEIGHT_NULL(row + 1, col) ? S : 0) | \
-	 (col < ncols - 1 && DIR(row + 1, col + 1) == NW && \
-	  !IS_WEIGHT_NULL(row + 1, col + 1) ? SE : 0) : 0))
+        (row > 0 ? \
+         (col > 0 && DIR(row - 1, col - 1) == SE && \
+          !IS_WEIGHT_NULL(row - 1, col - 1) ? NW : 0) | \
+         (DIR(row - 1, col) == S && !IS_WEIGHT_NULL(row - 1, col) ? N : 0) | \
+         (col < ncols - 1 && DIR(row - 1, col + 1) == SW && \
+          !IS_WEIGHT_NULL(row - 1, col + 1) ? NE : 0) : 0) | \
+        (col > 0 && DIR(row, col - 1) == E && \
+         !IS_WEIGHT_NULL(row, col - 1) ? W : 0) | \
+        (col < ncols - 1 && DIR(row, col + 1) == W && \
+         !IS_WEIGHT_NULL(row, col + 1) ? E : 0) | \
+        (row < nrows - 1 ? \
+         (col > 0 && DIR(row + 1, col - 1) == NE && \
+          !IS_WEIGHT_NULL(row + 1, col - 1) ? SW : 0) | \
+         (DIR(row + 1, col) == N && !IS_WEIGHT_NULL(row + 1, col) ? S : 0) | \
+         (col < ncols - 1 && DIR(row + 1, col + 1) == NW && \
+          !IS_WEIGHT_NULL(row + 1, col + 1) ? SE : 0) : 0))
 #else
 #define WEIGHT(row, col) 1
 #define FIND_UP(row, col) ( \
