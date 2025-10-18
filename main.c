@@ -170,29 +170,23 @@ int main(int argc, char *argv[])
     if (print_usage) {
         if (print_usage == 2)
             printf("\n");
-        printf("Usage: mefa OPTIONS dir accum\n");
-        printf("\n");
-        printf
-            ("  dir\t\tInput flow direction raster (e.g., gpkg:file.gpkg:layer)\n");
-        printf("  accum\t\tOutput flow accumulation GeoTIFF\n");
-        printf
-            ("  -a type\tFlow accumulation data type (default: uint32 or weight)\n");
-        printf("\t\tbyte, int16, uint16, int32, uint32, float32, float64\n");
-        printf("  -m\t\tUse less memory\n");
-        printf("  -c\t\tCompress output GeoTIFF\n");
-        printf("  -e encoding\tInput flow direction encoding\n");
-        printf
-            ("\t\tpower2 (default): 2^0-7 CW from E (e.g., r.terraflow, ArcGIS)\n");
-        printf("\t\ttaudem: 1-8 (E-SE CCW) (e.g., d8flowdir)\n");
-        printf("\t\t45degree: 1-8 (NE-E CCW) (e.g., r.watershed)\n");
-        printf("\t\tdegree: (0,360] (E-E CCW)\n");
-        printf
-            ("\t\tE,SE,S,SW,W,NW,N,NE: custom (e.g., 1,8,7,6,5,4,3,2 for taudem)\n");
-        printf("  -w weight\tInput weight raster\n");
-        printf("  -D opts\tComma-separated list of GDAL options for dir\n");
-        printf
-            ("  -W opts\tComma-separated list of GDAL options for weight\n");
-        printf("  -t threads\tNumber of threads (default OMP_NUM_THREADS)\n");
+        printf("Usage: mefa OPTIONS dir accum\n\n"
+               "  dir\t\tInput flow direction raster (e.g., gpkg:file.gpkg:layer)\n"
+               "  accum\t\tOutput flow accumulation GeoTIFF\n"
+               "  -a type\tFlow accumulation data type (default: uint32 or weight)\n"
+               "\t\tbyte, int16, uint16, int32, uint32, float32, float64\n"
+               "  -m\t\tUse less memory\n"
+               "  -c\t\tCompress output GeoTIFF\n"
+               "  -e encoding\tInput flow direction encoding\n"
+               "\t\tpower2 (default): 2^0-7 CW from E (e.g., r.terraflow, ArcGIS)\n"
+               "\t\ttaudem: 1-8 (E-SE CCW) (e.g., d8flowdir)\n"
+               "\t\t45degree: 1-8 (NE-E CCW) (e.g., r.watershed)\n"
+               "\t\tdegree: (0,360] (E-E CCW)\n"
+               "\t\tE,SE,S,SW,W,NW,N,NE: custom (e.g., 1,8,7,6,5,4,3,2 for taudem)\n"
+               "  -w weight\tInput weight raster\n"
+               "  -D opts\tComma-separated list of GDAL options for dir\n"
+               "  -W opts\tComma-separated list of GDAL options for weight\n"
+               "  -t threads\tNumber of threads (default OMP_NUM_THREADS)\n");
         exit(EXIT_SUCCESS);
     }
 
