@@ -30,7 +30,7 @@ int main(int argc, char *argv[])
                 case 'm':
                     use_lessmem = 1;
                     break;
-                case 'c':
+                case 'z':
                     compress_output = 1;
                     break;
                 case 'e':
@@ -125,7 +125,7 @@ int main(int argc, char *argv[])
                "  dir\t\tInput flow direction raster (e.g., gpkg:file.gpkg:layer)\n"
                "  accum\t\tOutput GeoTIFF\n"
                "  -m\t\tUse less memory\n"
-               "  -c\t\tCompress output GeoTIFF\n"
+               "  -z\t\tCompress output GeoTIFF\n"
                "  -e encoding\tInput flow direction encoding\n"
                "\t\tpower2 (default): 2^0-7 CW from E (e.g., r.terraflow, ArcGIS)\n"
                "\t\ttaudem: 1-8 (E-SE CCW) (e.g., d8flowdir)\n"
