@@ -1,0 +1,22 @@
+cff-version: 1.2.0
+title: "Memory-Efficient Flow Accumulation (MEFA)"
+version: "0.1.0"
+authors:
+  - family-names: Cho
+    given-names: Huidae
+date-released: "2023-07-01"
+url: "https://github.com/HuidaeCho/mefa"
+message: >
+  If you use this software or its algorithms, please cite the associated journal article.
+preferred-citation:
+  type: article
+  authors:
+    - family-names: Cho
+      given-names: Huidae
+  title: "Memory-Efficient Flow Accumulation Using a Look-Around Approach and Its OpenMP Parallelization"
+  journal: "Environmental Modelling & Software"
+  volume: 167
+  pages: "105771"
+  year: 2023
+  month: 7
+  doi: 10.1016/j.envsoft.2023.105771
