@@ -4,6 +4,7 @@ version: "0.1.0"
 authors:
   - family-names: Cho
     given-names: Huidae
+    orcid: "https://orcid.org/0000-0003-1878-1274"
 date-released: "2023-07-01"
 url: "https://github.com/HuidaeCho/mefa"
 message: >
